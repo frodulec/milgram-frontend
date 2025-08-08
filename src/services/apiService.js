@@ -21,3 +21,8 @@ export const getGameSequenceEventSource = () => {
 export const getNewContersationEventSource = () => {
   return new EventSource('http://localhost:8000/api/run-experiment');
 };
+
+export const fetchAllConversations = async () => {
+  const response = await apiClient.get('/api/load-all-conversations');
+  return response.data;
+};
