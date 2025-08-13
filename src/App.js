@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Box, VStack, Button, HStack, IconButton } from '@chakra-ui/react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Box, VStack, Button, HStack, IconButton, Portal, Select, createListCollection } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
-import { fetchTTSAudio, getGameSequenceEventSource, getNewContersationEventSource } from './services/apiService';
+import { fetchTTSAudio, getNewContersationEventSource, fetchAllConversations } from './services/apiService';
 import ImageDisplay from './components/ImageDisplay';
 import AudioControls from './components/AudioControls';
 import MessageHistory from './components/MessageHistory';
@@ -14,6 +14,11 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [isStarted, setIsStarted] = useState(false);
   const [followCurrentMessage, setFollowCurrentMessage] = useState(true);
+
+  // Conversations management
+  const [allConversations, setAllConversations] = useState([]);
+  const [participantModelFilter, setParticipantModelFilter] = useState('All');
+  const [selectedConversationId, setSelectedConversationId] = useState('');
 
   const [syncQueue, setSyncQueue] = useState([]);
   const [currentSyncIndex, setCurrentSyncIndex] = useState(-1);
@@ -58,12 +63,72 @@ function App() {
 
     loadDefaultImage();
 
+    // Load all conversations on mount
+    const loadConversations = async () => {
+      try {
+        const conversations = await fetchAllConversations();
+        // Sort by timestamp descending if present
+        const sorted = Array.isArray(conversations)
+          ? [...conversations].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+          : [];
+        setAllConversations(sorted);
+        // Initialize defaults
+        if (sorted.length > 0) {
+          setSelectedConversationId(sorted[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to load conversations:', err);
+      }
+    };
+
+    loadConversations();
+
     return () => {
       if (currentImage) {
         URL.revokeObjectURL(currentImage);
       }
     };
   }, []);
+
+  // Derived options
+  const participantModels = Array.from(
+    new Set(
+      (allConversations || [])
+        .map(c => c?.config?.participant_model?.model)
+        .filter(Boolean)
+    )
+  );
+
+  const filteredConversations = (allConversations || []).filter(c =>
+    participantModelFilter === 'All' || (c?.config?.participant_model?.model || '') === participantModelFilter
+  );
+
+  const participantModelCollection = useMemo(() => {
+    const items = [
+      { label: 'All', value: 'All' },
+      ...participantModels.map(m => ({ label: m, value: m }))
+    ];
+    return createListCollection({ items });
+  }, [participantModels]);
+
+  const conversationCollection = useMemo(() => {
+    const items = filteredConversations.map(c => {
+      const model = c?.config?.participant_model?.model || 'unknown-model';
+      const voltage = c?.final_voltage ? `${c.final_voltage}V` : '0V';
+      const exp_id = c.id.slice(0, 8);
+
+      const label = `${model} • ${voltage} • ${exp_id}`;
+      return { label, value: c.id };
+    });
+    return createListCollection({ items });
+  }, [filteredConversations]);
+
+  useEffect(() => {
+    // When filter changes, try keep selection valid
+    if (!filteredConversations.find(c => c.id === selectedConversationId)) {
+      setSelectedConversationId(filteredConversations[0]?.id || '');
+    }
+  }, [participantModelFilter, allConversations]);
 
   const startExperience = ({ new_conversation }) => {
     // If already started, just toggle play/pause
@@ -72,16 +137,23 @@ function App() {
       return;
     }
 
-    // Otherwise, start the experience
-    setIsStarted(true);
     setIsManuallyPaused(false);
 
+    // If starting from a chosen preloaded conversation, do not use the example SSE endpoint
     if (!new_conversation) {
-      eventSourceRef.current = getGameSequenceEventSource();
+      if (!selectedConversationId) {
+        console.warn('No conversation selected.');
+        return;
+      }
+      // Load selected conversation into messages and queue, then start
+      loadSelectedConversation();
+      setIsStarted(true);
+      return;
     }
-    else {
-      eventSourceRef.current = getNewContersationEventSource();
-    }
+
+    // Otherwise, start a brand new conversation using the run-experiment stream
+    setIsStarted(true);
+    eventSourceRef.current = getNewContersationEventSource();
 
     eventSourceRef.current.onmessage = async (event) => {
       const data = JSON.parse(event.data);
@@ -115,6 +187,32 @@ function App() {
       const queue = Array.isArray(prev) ? prev : [];
       return [...queue, syncItem];
     });
+  };
+
+  const resetPlaybackState = () => {
+    setMessages([]);
+    setSyncQueue([]);
+    setCurrentSyncIndex(-1);
+  };
+
+  const loadSelectedConversation = () => {
+    if (!selectedConversationId) return;
+    const conv = (allConversations || []).find(c => c.id === selectedConversationId);
+    if (!conv) return;
+
+    // Reset and load messages
+    resetPlaybackState();
+
+    const incomingMessages = Array.isArray(conv.messages) ? conv.messages : [];
+    const normalized = incomingMessages.map(m => ({
+      speaker: m.speaker,
+      text: m.text,
+      timestamp: new Date()
+    }));
+    setMessages(normalized);
+
+    // Queue processing for each message
+    normalized.forEach(m => addToSyncQueue(m.speaker, m.text));
   };
 
   const processSyncQueue = useCallback(async () => {
@@ -241,17 +339,90 @@ function App() {
             size="lg"
             onClick={() => startExperience({ new_conversation: false })}
           >
-            {isStarted ? (isPlaying ? "Pause Experience" : "Resume Experience") : "Start Experience"}
+            {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "Start Experiment"}
           </Button>
-          <Button
+          {/* <Button
             colorScheme="brand"
             bg="brand.500"
             color="white"
             size="lg"
             onClick={() => startExperience({ new_conversation: true })}
           >
-            {isStarted ? (isPlaying ? "Pause Experience" : "Resume Experience") : "New Conversation"}
-          </Button>
+            {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "New Conversation"}
+          </Button> */}
+
+          {/* Conversation selection controls */}
+          <HStack mt={2} spacing={2}>
+            <Select.Root
+              collection={participantModelCollection}
+              size="sm"
+              width="260px"
+              value={participantModelFilter ? [participantModelFilter] : []}
+              onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
+            >
+              <Select.HiddenSelect name="participant-model-filter" />
+              <Select.Label>Filter by participant model</Select.Label>
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText placeholder="Filter by participant model" />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {participantModelCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+
+            <Select.Root
+              collection={conversationCollection}
+              size="sm"
+              width="360px"
+              value={selectedConversationId ? [selectedConversationId] : []}
+              onValueChange={(details) => setSelectedConversationId(details.value[0] || '')}
+            >
+              <Select.HiddenSelect name="conversation-select" />
+              <Select.Label>Select conversation</Select.Label>
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText placeholder="Select conversation" />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                  <Select.Indicator />
+                </Select.IndicatorGroup>
+              </Select.Control>
+              <Portal>
+                <Select.Positioner>
+                  <Select.Content>
+                    {conversationCollection.items.map((item) => (
+                      <Select.Item item={item} key={item.value}>
+                        {item.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Positioner>
+              </Portal>
+            </Select.Root>
+            <Button
+              colorScheme="brand"
+              variant="outline"
+              onClick={loadSelectedConversation}
+              isDisabled={!selectedConversationId}
+            >
+              Load
+            </Button>
+          </HStack>
         </Box>
         <IconButton
           onClick={toggleColorMode}
