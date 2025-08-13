@@ -195,9 +195,9 @@ function App() {
     setCurrentSyncIndex(-1);
   };
 
-  const loadSelectedConversation = () => {
-    if (!selectedConversationId) return;
-    const conv = (allConversations || []).find(c => c.id === selectedConversationId);
+  const loadConversationById = (conversationId) => {
+    if (!conversationId) return;
+    const conv = (allConversations || []).find(c => c.id === conversationId);
     if (!conv) return;
 
     // Reset and load messages
@@ -213,6 +213,10 @@ function App() {
 
     // Queue processing for each message
     normalized.forEach(m => addToSyncQueue(m.speaker, m.text));
+  };
+
+  const loadSelectedConversation = () => {
+    loadConversationById(selectedConversationId);
   };
 
   const processSyncQueue = useCallback(async () => {
@@ -389,7 +393,13 @@ function App() {
               size="sm"
               width="360px"
               value={selectedConversationId ? [selectedConversationId] : []}
-              onValueChange={(details) => setSelectedConversationId(details.value[0] || '')}
+              onValueChange={(details) => {
+                const id = details.value[0] || '';
+                setSelectedConversationId(id);
+                if (id) {
+                  loadConversationById(id);
+                }
+              }}
             >
               <Select.HiddenSelect name="conversation-select" />
               <Select.Label>Select conversation</Select.Label>
