@@ -33,7 +33,7 @@ const AudioControls = ({
   // Then in your button:
   return (
     <Box
-      bg={colorMode === 'light' ? "brand.100" : "gray.700"}
+      bg={colorMode === 'light' ? "brand.50" : "gray.800"}
       p={4}
       borderRadius="md"
       borderWidth="1px"

@@ -404,100 +404,119 @@ function App() {
           />
 
           {/* Conversation selection controls (bottom right) */}
-          <VStack align="stretch" spacing={3} width="100%">
-            <Select.Root
-              collection={participantModelCollection}
-              size="sm"
-              width="100%"
-              value={participantModelFilter ? [participantModelFilter] : []}
-              onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
-            >
-              <Select.HiddenSelect name="participant-model-filter" />
-              <Select.Label>Filter by participant model</Select.Label>
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText placeholder="Filter by participant model" />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {participantModelCollection.items.map((item) => (
-                      <Select.Item item={item} key={item.value}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
-
-            <VStack spacing={1} align="stretch" width="100%">
-              <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
-                Voltage range: {voltageRange[0]}V – {voltageRange[1]}V
-              </Text>
-              <Slider.Root
-                value={voltageRange}
-                onValueChange={(details) => setVoltageRange(details.value)}
-                min={Math.min(voltageRange[0], voltageRange[1], 0)}
-                max={Math.max(voltageRange[0], voltageRange[1], 450)}
-                step={5}
+          <Box
+            bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="brand.500"
+            boxShadow="sm"
+          >
+            <VStack align="stretch" spacing={3} width="100%">
+              <Select.Root
+                collection={participantModelCollection}
+                size="sm"
+                width="100%"
+                value={participantModelFilter ? [participantModelFilter] : []}
+                onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
               >
-                <Slider.Control>
-                  <Slider.Track>
-                    <Slider.Range />
-                  </Slider.Track>
-                  <Slider.Thumb index={0}>
-                    <Slider.HiddenInput />
-                  </Slider.Thumb>
-                  <Slider.Thumb index={1}>
-                    <Slider.HiddenInput />
-                  </Slider.Thumb>
-                </Slider.Control>
-              </Slider.Root>
-            </VStack>
+                <Select.HiddenSelect name="participant-model-filter" />
+                <Select.Label>Filter by participant model</Select.Label>
+                <Select.Control
+                  bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                  borderWidth="1px"
+                  borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                  borderRadius="md"
+                >
+                  <Select.Trigger>
+                    <Select.ValueText placeholder="Filter by participant model" />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {participantModelCollection.items.map((item) => (
+                        <Select.Item item={item} key={item.value}>
+                          {item.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
 
-            <Select.Root
-              collection={conversationCollection}
-              size="sm"
-              width="100%"
-              value={selectedConversationId ? [selectedConversationId] : []}
-              onValueChange={(details) => {
-                const id = details.value[0] || '';
-                setSelectedConversationId(id);
-                if (id) {
-                  loadConversationById(id);
-                }
-              }}
-            >
-              <Select.HiddenSelect name="conversation-select" />
-              <Select.Label>Select conversation</Select.Label>
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText placeholder="Select conversation" />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {conversationCollection.items.map((item) => (
-                      <Select.Item item={item} key={item.value}>
-                        {item.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
-          </VStack>
+              <VStack spacing={1} align="stretch" width="100%">
+                <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+                  Voltage range: {voltageRange[0]}V – {voltageRange[1]}V
+                </Text>
+                <Slider.Root
+                  value={voltageRange}
+                  onValueChange={(details) => setVoltageRange(details.value)}
+                  min={Math.min(voltageRange[0], voltageRange[1], 0)}
+                  max={Math.max(voltageRange[0], voltageRange[1], 450)}
+                  step={5}
+                >
+                  <Slider.Control>
+                    <Slider.Track>
+                      <Slider.Range />
+                    </Slider.Track>
+                    <Slider.Thumb index={0}>
+                      <Slider.HiddenInput />
+                    </Slider.Thumb>
+                    <Slider.Thumb index={1}>
+                      <Slider.HiddenInput />
+                    </Slider.Thumb>
+                  </Slider.Control>
+                </Slider.Root>
+              </VStack>
+
+              <Select.Root
+                collection={conversationCollection}
+                size="sm"
+                width="100%"
+                value={selectedConversationId ? [selectedConversationId] : []}
+                onValueChange={(details) => {
+                  const id = details.value[0] || '';
+                  setSelectedConversationId(id);
+                  if (id) {
+                    loadConversationById(id);
+                  }
+                }}
+              >
+                <Select.HiddenSelect name="conversation-select" />
+                <Select.Label>Select conversation</Select.Label>
+                <Select.Control
+                  bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                  borderWidth="1px"
+                  borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                  borderRadius="md"
+                >
+                  <Select.Trigger>
+                    <Select.ValueText placeholder="Select conversation" />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {conversationCollection.items.map((item) => (
+                        <Select.Item item={item} key={item.value}>
+                          {item.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+            </VStack>
+          </Box>
         </VStack>
       </HStack>
 
