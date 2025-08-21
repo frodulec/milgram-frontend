@@ -43,7 +43,8 @@ function App() {
     handleVolumeChange,
     handlePlaybackRateChange,
     setIsManuallyPaused,
-    setCurrentImage
+    setCurrentImage,
+    resetAudioPlayer
   } = useAudioPlayer({
     syncQueue,
     currentSyncIndex,
@@ -233,9 +234,29 @@ function App() {
   };
 
   const resetPlaybackState = () => {
+    // Stop any ongoing streams
+    if (eventSourceRef.current) {
+      try { eventSourceRef.current.close(); } catch (_) { }
+      eventSourceRef.current = null;
+    }
+    // Reset audio player state and UI
+    resetAudioPlayer();
+    setIsStarted(false);
+
     setMessages([]);
     setSyncQueue([]);
     setCurrentSyncIndex(-1);
+
+    // Load a fresh default image again after clearing
+    (async () => {
+      try {
+        const imageBlob = await imageGenerator.generateImage({});
+        const imageUrl = URL.createObjectURL(imageBlob);
+        setCurrentImage(imageUrl);
+      } catch (error) {
+        console.error('Failed to generate default image on reset:', error);
+      }
+    })();
   };
 
   const loadConversationById = (conversationId) => {
@@ -537,8 +558,9 @@ function App() {
                     value={selectedConversationId ? [selectedConversationId] : []}
                     onValueChange={(details) => {
                       const id = details.value[0] || '';
-                      setSelectedConversationId(id);
-                      if (id) {
+                      if (id && id !== selectedConversationId) {
+                        resetPlaybackState();
+                        setSelectedConversationId(id);
                         loadConversationById(id);
                       }
                     }}
