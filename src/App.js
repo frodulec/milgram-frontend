@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
@@ -113,6 +113,26 @@ function App() {
     return modelOk && voltageOk;
   });
 
+  const resetAllFilters = () => {
+    setParticipantModelFilter('All');
+    // Compute full voltage range from all conversations
+    const volts = (allConversations || [])
+      .map(c => (typeof c?.final_voltage === 'number' ? c.final_voltage : null))
+      .filter(v => v !== null);
+    const minV = volts.length ? Math.min(...volts) : 0;
+    const maxV = volts.length ? Math.max(...volts) : 450;
+    setVoltageRange([minV, maxV]);
+
+    if ((allConversations || []).length > 0) {
+      const firstId = allConversations[0].id;
+      setSelectedConversationId(firstId);
+      loadConversationById(firstId);
+    } else {
+      setSelectedConversationId('');
+      resetPlaybackState();
+    }
+  };
+
   const participantModelCollection = useMemo(() => {
     const items = [
       { label: 'All', value: 'All' },
@@ -136,6 +156,10 @@ function App() {
   useEffect(() => {
     if (!filteredConversations.find(c => c.id === selectedConversationId)) {
       setSelectedConversationId(filteredConversations[0]?.id || '');
+      if (filteredConversations.length === 0) {
+        // Clear current playback when no conversations match the filters
+        resetPlaybackState();
+      }
     }
   }, [participantModelFilter, allConversations, filteredConversations, selectedConversationId]);
 
@@ -389,19 +413,44 @@ function App() {
               hidePlayPauseButton={true}
               isStarted={isStarted}
               runPlaybackFunc={() => startExperience({ new_conversation: false })}
+              tileMinHeight="240px"
+              tileHeight="240px"
             />
           </Box>
         </VStack>
 
         {/* Right Column: Message History + Conversation selection (bottom right) */}
         <VStack flex="1" align="stretch" spacing={4}>
-          <MessageHistory
-            messages={messages}
-            currentSyncIndex={currentSyncIndex}
-            colorMode={colorMode}
-            followCurrentMessage={followCurrentMessage}
-            onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
-          />
+          {filteredConversations.length === 0 ? (
+            <Box
+              bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+              p={4}
+              borderRadius="md"
+              height="600px"
+              overflowY="auto"
+              borderWidth="1px"
+              borderColor="brand.500"
+              boxShadow="md"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <VStack spacing={3}>
+                <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
+                  No conversations with selected filters
+                </Text>
+                <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+              </VStack>
+            </Box>
+          ) : (
+            <MessageHistory
+              messages={messages}
+              currentSyncIndex={currentSyncIndex}
+              colorMode={colorMode}
+              followCurrentMessage={followCurrentMessage}
+              onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+            />
+          )}
 
           {/* Conversation selection controls (bottom right) */}
           <Box
@@ -411,6 +460,8 @@ function App() {
             borderWidth="1px"
             borderColor="brand.500"
             boxShadow="sm"
+            minH="240px"
+            height="240px"
           >
             <VStack align="stretch" spacing={3} width="100%">
               <Select.Root
@@ -474,47 +525,54 @@ function App() {
                 </Slider.Root>
               </VStack>
 
-              <Select.Root
-                collection={conversationCollection}
-                size="sm"
-                width="100%"
-                value={selectedConversationId ? [selectedConversationId] : []}
-                onValueChange={(details) => {
-                  const id = details.value[0] || '';
-                  setSelectedConversationId(id);
-                  if (id) {
-                    loadConversationById(id);
-                  }
-                }}
-              >
-                <Select.HiddenSelect name="conversation-select" />
-                <Select.Label>Select conversation</Select.Label>
-                <Select.Control
-                  bg={colorMode === 'light' ? 'white' : 'gray.700'}
-                  borderWidth="1px"
-                  borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                  borderRadius="md"
-                >
-                  <Select.Trigger>
-                    <Select.ValueText placeholder="Select conversation" />
-                  </Select.Trigger>
-                  <Select.IndicatorGroup>
-                    <Select.Indicator />
-                  </Select.IndicatorGroup>
-                </Select.Control>
-                <Portal>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {conversationCollection.items.map((item) => (
-                        <Select.Item item={item} key={item.value}>
-                          {item.label}
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Portal>
-              </Select.Root>
+              <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+                Select conversation
+              </Text>
+              <HStack spacing={2} align="center">
+                <Box flex="1">
+                  <Select.Root
+                    collection={conversationCollection}
+                    size="sm"
+                    width="100%"
+                    value={selectedConversationId ? [selectedConversationId] : []}
+                    onValueChange={(details) => {
+                      const id = details.value[0] || '';
+                      setSelectedConversationId(id);
+                      if (id) {
+                        loadConversationById(id);
+                      }
+                    }}
+                  >
+                    <Select.HiddenSelect name="conversation-select" />
+                    <Select.Control
+                      bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                      borderWidth="1px"
+                      borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                      borderRadius="md"
+                    >
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select conversation" />
+                      </Select.Trigger>
+                      <Select.IndicatorGroup>
+                        <Select.Indicator />
+                      </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Portal>
+                      <Select.Positioner>
+                        <Select.Content>
+                          {conversationCollection.items.map((item) => (
+                            <Select.Item item={item} key={item.value}>
+                              {item.label}
+                              <Select.ItemIndicator />
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Positioner>
+                    </Portal>
+                  </Select.Root>
+                </Box>
+                <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+              </HStack>
             </VStack>
           </Box>
         </VStack>

@@ -19,7 +19,9 @@ const AudioControls = ({
   isQueueEmpty,
   hidePlayPauseButton = false,
   isStarted = false,
-  runPlaybackFunc = null
+  runPlaybackFunc = null,
+  tileMinHeight = null,
+  tileHeight = null
 }) => {
   // Make sure to use runPlaybackFunc if provided, otherwise fallback to onPlayPause
   const handlePlaybackControl = () => {
@@ -39,142 +41,148 @@ const AudioControls = ({
       borderWidth="1px"
       borderColor="brand.500"
       boxShadow="sm"
+      minH={tileMinHeight || undefined}
+      height={tileHeight || undefined}
+      display="flex"
+      alignItems="center"
     >
-      <Text
-        fontSize="md"
-        fontWeight="bold"
-        mb={2}
-        textAlign="center"
-        color={colorMode === 'light' ? "semantic.text" : "white"}
-      >
-        Playback Controls
-      </Text>
-
-      {/* Playback Controls */}
-      <HStack spacing={2} mb={3}>
-        <IconButton
-          size="sm"
-          onClick={onPrevious}
-          isDisabled={currentSyncIndex <= 0}
-          aria-label="Previous"
-          colorScheme="brand"
+      <Box maxW="720px" width="80%" mx="auto">
+        <Text
+          fontSize="md"
+          fontWeight="bold"
+          mb={2}
+          textAlign="center"
+          color={colorMode === 'light' ? "semantic.text" : "white"}
         >
-          <FaBackward />
-        </IconButton>
+          Playback Controls
+        </Text>
 
-        <Box textAlign="center">
-          <Button
-            colorScheme="brand"
-            bg="brand.500"
-            color="white"
-            size="sm"
-            minW="160px"
-            onClick={handlePlaybackControl}
-          >
-            {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "Start Experiment"}
-          </Button>
-        </Box>
-
-        {!hidePlayPauseButton && (
+        {/* Playback Controls */}
+        <HStack spacing={2} mb={3} justifyContent="center">
           <IconButton
             size="sm"
-            onClick={onPlayPause}
-            isDisabled={currentSyncIndex === -1}
-            aria-label={isPlaying ? "Pause" : "Play"}
+            onClick={onPrevious}
+            isDisabled={currentSyncIndex <= 0}
+            aria-label="Previous"
             colorScheme="brand"
           >
-            {isPlaying ? <FaPause /> : <FaPlay />}
+            <FaBackward />
           </IconButton>
-        )}
-        <IconButton
-          size="sm"
-          onClick={onNext}
-          isDisabled={currentSyncIndex >= totalItems - 1}
-          aria-label="Next"
-          colorScheme="brand"
-        >
-          <FaForward />
-        </IconButton>
-        <IconButton
-          size="sm"
-          onClick={onMute}
-          aria-label={isMuted ? "Unmute" : "Mute"}
-          colorScheme="brand"
-        >
-          {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-        </IconButton>
 
-      </HStack>
+          <Box textAlign="center">
+            <Button
+              colorScheme="brand"
+              bg="brand.500"
+              color="white"
+              size="sm"
+              minW="160px"
+              onClick={handlePlaybackControl}
+            >
+              {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "Start Experiment"}
+            </Button>
+          </Box>
 
-      {/* Volume Control */}
-      <HStack spacing={2} mb={2}>
-        <Text
-          fontSize="sm"
-          minW="60px"
-          color={colorMode === 'light' ? "semantic.text" : "white"}
-        >
-          Volume:
-        </Text>
-        <Slider.Root
-          value={[volume]}
-          onValueChange={(details) => onVolumeChange(details.value[0])}
-          min={0}
-          max={1}
-          step={0.1}
-          flex={1}
-        >
-          <Slider.Control>
-            <Slider.Track>
-              <Slider.Range />
-            </Slider.Track>
-            <Slider.Thumb>
-              <Slider.HiddenInput />
-            </Slider.Thumb>
-          </Slider.Control>
-        </Slider.Root>
-        <Text
-          fontSize="sm"
-          minW="30px"
-          color={colorMode === 'light' ? "semantic.text" : "white"}
-        >
-          {Math.round(volume * 100)}%
-        </Text>
-      </HStack>
+          {!hidePlayPauseButton && (
+            <IconButton
+              size="sm"
+              onClick={onPlayPause}
+              isDisabled={currentSyncIndex === -1}
+              aria-label={isPlaying ? "Pause" : "Play"}
+              colorScheme="brand"
+            >
+              {isPlaying ? <FaPause /> : <FaPlay />}
+            </IconButton>
+          )}
+          <IconButton
+            size="sm"
+            onClick={onNext}
+            isDisabled={currentSyncIndex >= totalItems - 1}
+            aria-label="Next"
+            colorScheme="brand"
+          >
+            <FaForward />
+          </IconButton>
+          <IconButton
+            size="sm"
+            onClick={onMute}
+            aria-label={isMuted ? "Unmute" : "Mute"}
+            colorScheme="brand"
+          >
+            {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+          </IconButton>
 
-      {/* Playback Speed Control */}
-      <HStack spacing={2}>
-        <Text
-          fontSize="sm"
-          minW="60px"
-          color={colorMode === 'light' ? "semantic.text" : "white"}
-        >
-          Speed:
-        </Text>
-        <Slider.Root
-          value={[playbackRate]}
-          onValueChange={(details) => onPlaybackRateChange(details.value[0])}
-          min={0.5}
-          max={4}
-          step={0.1}
-          flex={1}
-        >
-          <Slider.Control>
-            <Slider.Track>
-              <Slider.Range />
-            </Slider.Track>
-            <Slider.Thumb>
-              <Slider.HiddenInput />
-            </Slider.Thumb>
-          </Slider.Control>
-        </Slider.Root>
-        <Text
-          fontSize="sm"
-          minW="30px"
-          color={colorMode === 'light' ? "semantic.text" : "white"}
-        >
-          {playbackRate}x
-        </Text>
-      </HStack>
+        </HStack>
+
+        {/* Volume Control */}
+        <HStack spacing={2} mb={2}>
+          <Text
+            fontSize="sm"
+            minW="60px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            Volume:
+          </Text>
+          <Slider.Root
+            value={[volume]}
+            onValueChange={(details) => onVolumeChange(details.value[0])}
+            min={0}
+            max={1}
+            step={0.1}
+            flex={1}
+          >
+            <Slider.Control>
+              <Slider.Track>
+                <Slider.Range />
+              </Slider.Track>
+              <Slider.Thumb>
+                <Slider.HiddenInput />
+              </Slider.Thumb>
+            </Slider.Control>
+          </Slider.Root>
+          <Text
+            fontSize="sm"
+            minW="30px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            {Math.round(volume * 100)}%
+          </Text>
+        </HStack>
+
+        {/* Playback Speed Control */}
+        <HStack spacing={2}>
+          <Text
+            fontSize="sm"
+            minW="60px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            Speed:
+          </Text>
+          <Slider.Root
+            value={[playbackRate]}
+            onValueChange={(details) => onPlaybackRateChange(details.value[0])}
+            min={0.5}
+            max={4}
+            step={0.1}
+            flex={1}
+          >
+            <Slider.Control>
+              <Slider.Track>
+                <Slider.Range />
+              </Slider.Track>
+              <Slider.Thumb>
+                <Slider.HiddenInput />
+              </Slider.Thumb>
+            </Slider.Control>
+          </Slider.Root>
+          <Text
+            fontSize="sm"
+            minW="30px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            {playbackRate}x
+          </Text>
+        </HStack>
+      </Box>
     </Box>
   );
 };

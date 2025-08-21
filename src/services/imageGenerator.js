@@ -32,7 +32,7 @@ export class ImageGenerator {
     this.shockPos = { x: 700, y: 400 };
     this.shockScale = { x: 0.075, y: 0.075 };
 
-    this.learnerPos = { x: 710, y: 390 };
+    this.learnerPos = { x: 710, y: 380 };
     this.learnerScale = { x: 1.05, y: 1.05 };
 
     this.participantPos = { x: 400, y: 780 };
