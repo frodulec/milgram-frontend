@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Box, VStack, Button, HStack, IconButton, Portal, Select, createListCollection } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
@@ -19,6 +19,7 @@ function App() {
   const [allConversations, setAllConversations] = useState([]);
   const [participantModelFilter, setParticipantModelFilter] = useState('All');
   const [selectedConversationId, setSelectedConversationId] = useState('');
+  const [voltageRange, setVoltageRange] = useState([0, 450]);
 
   const [syncQueue, setSyncQueue] = useState([]);
   const [currentSyncIndex, setCurrentSyncIndex] = useState(-1);
@@ -75,6 +76,12 @@ function App() {
         // Initialize defaults
         if (sorted.length > 0) {
           setSelectedConversationId(sorted[0].id);
+          const volts = sorted
+            .map(c => typeof c?.final_voltage === 'number' ? c.final_voltage : null)
+            .filter(v => v !== null);
+          const minV = volts.length ? Math.min(...volts) : 0;
+          const maxV = volts.length ? Math.max(...volts) : 450;
+          setVoltageRange([minV, maxV]);
         }
       } catch (err) {
         console.error('Failed to load conversations:', err);
@@ -99,9 +106,12 @@ function App() {
     )
   );
 
-  const filteredConversations = (allConversations || []).filter(c =>
-    participantModelFilter === 'All' || (c?.config?.participant_model?.model || '') === participantModelFilter
-  );
+  const filteredConversations = (allConversations || []).filter(c => {
+    const modelOk = participantModelFilter === 'All' || (c?.config?.participant_model?.model || '') === participantModelFilter;
+    const v = typeof c?.final_voltage === 'number' ? c.final_voltage : 0;
+    const voltageOk = v >= voltageRange[0] && v <= voltageRange[1];
+    return modelOk && voltageOk;
+  });
 
   const participantModelCollection = useMemo(() => {
     const items = [
@@ -124,11 +134,20 @@ function App() {
   }, [filteredConversations]);
 
   useEffect(() => {
-    // When filter changes, try keep selection valid
     if (!filteredConversations.find(c => c.id === selectedConversationId)) {
       setSelectedConversationId(filteredConversations[0]?.id || '');
     }
-  }, [participantModelFilter, allConversations]);
+  }, [participantModelFilter, allConversations, filteredConversations, selectedConversationId]);
+
+  // Auto-load the currently selected conversation by default
+  useEffect(() => {
+    if (selectedConversationId) {
+      // Only auto-load if nothing is currently loaded to avoid disrupting playback
+      if (messages.length === 0) {
+        loadConversationById(selectedConversationId);
+      }
+    }
+  }, [selectedConversationId, allConversations]);
 
   const startExperience = ({ new_conversation }) => {
     // If already started, just toggle play/pause
@@ -334,33 +353,62 @@ function App() {
 
   return (
     <Box p={4} maxW="1200px" mx="auto">
-      <HStack justifyContent="space-between" alignItems="center" py={4} mb={4}>
-        <Box textAlign="center">
-          <Button
-            colorScheme="brand"
-            bg="brand.500"
-            color="white"
-            size="lg"
-            onClick={() => startExperience({ new_conversation: false })}
-          >
-            {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "Start Experiment"}
-          </Button>
-          {/* <Button
-            colorScheme="brand"
-            bg="brand.500"
-            color="white"
-            size="lg"
-            onClick={() => startExperience({ new_conversation: true })}
-          >
-            {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "New Conversation"}
-          </Button> */}
+      <HStack justifyContent="flex-end" alignItems="center" py={4} mb={4}>
+        <IconButton
+          onClick={toggleColorMode}
+          variant="outline"
+          size="sm"
+        >
+          {colorMode === "light" ? <LuSun /> : <LuMoon />}
+        </IconButton>
+      </HStack>
 
-          {/* Conversation selection controls */}
-          <HStack mt={2} spacing={2}>
+      <HStack align="flex-start" spacing={6}>
+        {/* Left Column: Image and Audio Controls */}
+        <VStack flex="1" align="stretch" spacing={4}>
+          {/* Game Image Display with Placeholder */}
+          <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+
+          {/* Audio Controls (full width under the image) */}
+          <Box width="100%">
+            <AudioControls
+              isPlaying={isPlaying}
+              isMuted={isMuted}
+              volume={volume}
+              playbackRate={playbackRate}
+              currentSyncIndex={currentSyncIndex}
+              totalItems={syncQueue.length}
+              onPlayPause={togglePlayPause}
+              onPrevious={playPreviousItem}
+              onNext={playNextItem}
+              onMute={toggleMute}
+              onVolumeChange={handleVolumeChange}
+              onPlaybackRateChange={handlePlaybackRateChange}
+              colorMode={colorMode}
+              isQueueEmpty={syncQueue.length === 0}
+              hidePlayPauseButton={true}
+              isStarted={isStarted}
+              runPlaybackFunc={() => startExperience({ new_conversation: false })}
+            />
+          </Box>
+        </VStack>
+
+        {/* Right Column: Message History + Conversation selection (bottom right) */}
+        <VStack flex="1" align="stretch" spacing={4}>
+          <MessageHistory
+            messages={messages}
+            currentSyncIndex={currentSyncIndex}
+            colorMode={colorMode}
+            followCurrentMessage={followCurrentMessage}
+            onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+          />
+
+          {/* Conversation selection controls (bottom right) */}
+          <VStack align="stretch" spacing={3} width="100%">
             <Select.Root
               collection={participantModelCollection}
               size="sm"
-              width="260px"
+              width="100%"
               value={participantModelFilter ? [participantModelFilter] : []}
               onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
             >
@@ -388,10 +436,35 @@ function App() {
               </Portal>
             </Select.Root>
 
+            <VStack spacing={1} align="stretch" width="100%">
+              <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+                Voltage range: {voltageRange[0]}V – {voltageRange[1]}V
+              </Text>
+              <Slider.Root
+                value={voltageRange}
+                onValueChange={(details) => setVoltageRange(details.value)}
+                min={Math.min(voltageRange[0], voltageRange[1], 0)}
+                max={Math.max(voltageRange[0], voltageRange[1], 450)}
+                step={5}
+              >
+                <Slider.Control>
+                  <Slider.Track>
+                    <Slider.Range />
+                  </Slider.Track>
+                  <Slider.Thumb index={0}>
+                    <Slider.HiddenInput />
+                  </Slider.Thumb>
+                  <Slider.Thumb index={1}>
+                    <Slider.HiddenInput />
+                  </Slider.Thumb>
+                </Slider.Control>
+              </Slider.Root>
+            </VStack>
+
             <Select.Root
               collection={conversationCollection}
               size="sm"
-              width="360px"
+              width="100%"
               value={selectedConversationId ? [selectedConversationId] : []}
               onValueChange={(details) => {
                 const id = details.value[0] || '';
@@ -424,59 +497,8 @@ function App() {
                 </Select.Positioner>
               </Portal>
             </Select.Root>
-            <Button
-              colorScheme="brand"
-              variant="outline"
-              onClick={loadSelectedConversation}
-              isDisabled={!selectedConversationId}
-            >
-              Load
-            </Button>
-          </HStack>
-        </Box>
-        <IconButton
-          onClick={toggleColorMode}
-          variant="outline"
-          size="sm"
-        >
-          {colorMode === "light" ? <LuSun /> : <LuMoon />}
-        </IconButton>
-      </HStack>
-
-      <HStack align="flex-start" spacing={6}>
-        {/* Left Column: Image and Audio Controls */}
-        <VStack flex="1" align="stretch" spacing={4}>
-          {/* Game Image Display with Placeholder */}
-          <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
-
-          {/* Audio Controls (now under the image) */}
-          <AudioControls
-            isPlaying={isPlaying}
-            isMuted={isMuted}
-            volume={volume}
-            playbackRate={playbackRate}
-            currentSyncIndex={currentSyncIndex}
-            totalItems={syncQueue.length}
-            onPlayPause={togglePlayPause}
-            onPrevious={playPreviousItem}
-            onNext={playNextItem}
-            onMute={toggleMute}
-            onVolumeChange={handleVolumeChange}
-            onPlaybackRateChange={handlePlaybackRateChange}
-            colorMode={colorMode}
-            isQueueEmpty={syncQueue.length === 0}
-            hidePlayPauseButton={true}
-          />
+          </VStack>
         </VStack>
-
-        {/* Right Column: Message History */}
-        <MessageHistory
-          messages={messages}
-          currentSyncIndex={currentSyncIndex}
-          colorMode={colorMode}
-          followCurrentMessage={followCurrentMessage}
-          onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
-        />
       </HStack>
 
       <audio ref={audioRef} />
