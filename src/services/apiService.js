@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://milgram-experiments.railway.internal:8000';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://milgram-experiments-production.up.railway.app';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL
