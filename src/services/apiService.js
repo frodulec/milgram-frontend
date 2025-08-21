@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+
 const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000' // Replace 8000 with your backend port
+  baseURL: API_BASE_URL
 });
 
 export const fetchTTSAudio = async (speaker, text) => {
@@ -15,11 +17,11 @@ export const fetchTTSAudio = async (speaker, text) => {
 };
 
 export const getGameSequenceEventSource = () => {
-  return new EventSource('http://localhost:8000/api/game-sequence-example');
+  return new EventSource(`${API_BASE_URL}/api/game-sequence-example`);
 };
 
 export const getNewContersationEventSource = () => {
-  return new EventSource('http://localhost:8000/api/run-experiment');
+  return new EventSource(`${API_BASE_URL}/api/run-experiment`);
 };
 
 export const fetchAllConversations = async () => {
