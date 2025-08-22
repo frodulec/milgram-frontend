@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button, useBreakpointValue, SimpleGrid } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
@@ -396,6 +396,9 @@ function App() {
     };
   }, [syncQueue, currentImage]);
 
+  // Responsive layout hook
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
     <Box p={4} maxW="1200px" mx="auto">
       <HStack justifyContent="flex-end" alignItems="center" py={4} mb={4}>
@@ -408,82 +411,71 @@ function App() {
         </IconButton>
       </HStack>
 
-      <HStack align="flex-start" spacing={6}>
-        {/* Left Column: Image and Audio Controls */}
-        <VStack flex="1" align="stretch" spacing={4}>
-          {/* Game Image Display with Placeholder */}
-          <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
-
-          {/* Audio Controls (full width under the image) */}
-          <Box width="100%">
-            <AudioControls
-              isPlaying={isPlaying}
-              isMuted={isMuted}
-              volume={volume}
-              playbackRate={playbackRate}
-              currentSyncIndex={currentSyncIndex}
-              totalItems={syncQueue.length}
-              onPlayPause={togglePlayPause}
-              onPrevious={playPreviousItem}
-              onNext={playNextItem}
-              onMute={toggleMute}
-              onVolumeChange={handleVolumeChange}
-              onPlaybackRateChange={handlePlaybackRateChange}
-              colorMode={colorMode}
-              isQueueEmpty={syncQueue.length === 0}
-              hidePlayPauseButton={true}
-              isStarted={isStarted}
-              runPlaybackFunc={() => startExperience({ new_conversation: false })}
-              tileMinHeight="240px"
-              tileHeight="240px"
-            />
-          </Box>
-        </VStack>
-
-        {/* Right Column: Message History + Conversation selection (bottom right) */}
-        <VStack flex="1" align="stretch" spacing={4}>
-          {filteredConversations.length === 0 ? (
-            <Box
-              bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-              p={4}
-              borderRadius="md"
-              height="600px"
-              overflowY="auto"
-              borderWidth="1px"
-              borderColor="brand.500"
-              boxShadow="md"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <VStack spacing={3}>
-                <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
-                  No conversations with selected filters
-                </Text>
-                <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
-              </VStack>
-            </Box>
-          ) : (
-            <MessageHistory
-              messages={messages}
-              currentSyncIndex={currentSyncIndex}
-              colorMode={colorMode}
-              followCurrentMessage={followCurrentMessage}
-              onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
-            />
-          )}
-
-          {/* Conversation selection controls (bottom right) */}
-          <Box
+      {isMobile ? (
+        /* Mobile Layout - Vertical stack with two main tiles */
+        <VStack align="stretch" spacing={4}>
+          {/* Mobile Tile 1: Image and Conversation History */}
+          <VStack
+            align="stretch"
+            spacing={4}
             bg={colorMode === 'light' ? "brand.50" : "gray.800"}
             p={4}
             borderRadius="md"
             borderWidth="1px"
             borderColor="brand.500"
-            boxShadow="sm"
-            minH="240px"
-            height="240px"
+            boxShadow="md"
           >
+            {/* Image Display */}
+            <Box minH="300px" maxH="400px">
+              <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+            </Box>
+
+            {/* Conversation History below image */}
+            <Box minH="300px" maxH="400px" overflow="auto">
+              {filteredConversations.length === 0 ? (
+                <Box
+                  bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+                  p={4}
+                  borderRadius="md"
+                  height="100%"
+                  borderWidth="1px"
+                  borderColor="brand.500"
+                  boxShadow="md"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <VStack spacing={3}>
+                    <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
+                      No conversations with selected filters
+                    </Text>
+                    <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                  </VStack>
+                </Box>
+              ) : (
+                <MessageHistory
+                  messages={messages}
+                  currentSyncIndex={currentSyncIndex}
+                  colorMode={colorMode}
+                  followCurrentMessage={followCurrentMessage}
+                  onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+                />
+              )}
+            </Box>
+          </VStack>
+
+          {/* Mobile Tile 2: Conversation Filtering and Audio Controls */}
+          <VStack
+            align="stretch"
+            spacing={4}
+            bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="brand.500"
+            boxShadow="md"
+          >
+            {/* Conversation Selection Controls */}
             <VStack align="stretch" spacing={3} width="100%">
               <Select.Root
                 collection={participantModelCollection}
@@ -593,12 +585,230 @@ function App() {
                     </Portal>
                   </Select.Root>
                 </Box>
-                <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                <Button colorScheme="brand" onClick={resetAllFilters} size="sm">Reset</Button>
               </HStack>
             </VStack>
-          </Box>
+
+            {/* Audio Controls below filtering */}
+            <Box width="100%">
+              <AudioControls
+                isPlaying={isPlaying}
+                isMuted={isMuted}
+                volume={volume}
+                playbackRate={playbackRate}
+                currentSyncIndex={currentSyncIndex}
+                totalItems={syncQueue.length}
+                onPlayPause={togglePlayPause}
+                onPrevious={playPreviousItem}
+                onNext={playNextItem}
+                onMute={toggleMute}
+                onVolumeChange={handleVolumeChange}
+                onPlaybackRateChange={handlePlaybackRateChange}
+                colorMode={colorMode}
+                isQueueEmpty={syncQueue.length === 0}
+                hidePlayPauseButton={true}
+                isStarted={isStarted}
+                runPlaybackFunc={() => startExperience({ new_conversation: false })}
+                tileMinHeight="200px"
+                tileHeight="auto"
+              />
+            </Box>
+          </VStack>
         </VStack>
-      </HStack>
+      ) : (
+        /* Desktop Layout - Original horizontal layout */
+        <HStack align="flex-start" spacing={6}>
+          {/* Left Column: Image and Audio Controls */}
+          <VStack flex="1" align="stretch" spacing={4}>
+            {/* Game Image Display with Placeholder */}
+            <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+
+            {/* Audio Controls (full width under the image) */}
+            <Box width="100%">
+              <AudioControls
+                isPlaying={isPlaying}
+                isMuted={isMuted}
+                volume={volume}
+                playbackRate={playbackRate}
+                currentSyncIndex={currentSyncIndex}
+                totalItems={syncQueue.length}
+                onPlayPause={togglePlayPause}
+                onPrevious={playPreviousItem}
+                onNext={playNextItem}
+                onMute={toggleMute}
+                onVolumeChange={handleVolumeChange}
+                onPlaybackRateChange={handlePlaybackRateChange}
+                colorMode={colorMode}
+                isQueueEmpty={syncQueue.length === 0}
+                hidePlayPauseButton={true}
+                isStarted={isStarted}
+                runPlaybackFunc={() => startExperience({ new_conversation: false })}
+                tileMinHeight="240px"
+                tileHeight="240px"
+              />
+            </Box>
+          </VStack>
+
+          {/* Right Column: Message History + Conversation selection (bottom right) */}
+          <VStack flex="1" align="stretch" spacing={4}>
+            {filteredConversations.length === 0 ? (
+              <Box
+                bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+                p={4}
+                borderRadius="md"
+                height="600px"
+                overflowY="auto"
+                borderWidth="1px"
+                borderColor="brand.500"
+                boxShadow="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <VStack spacing={3}>
+                  <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
+                    No conversations with selected filters
+                  </Text>
+                  <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                </VStack>
+              </Box>
+            ) : (
+              <MessageHistory
+                messages={messages}
+                currentSyncIndex={currentSyncIndex}
+                colorMode={colorMode}
+                followCurrentMessage={followCurrentMessage}
+                onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+              />
+            )}
+
+            {/* Conversation selection controls (bottom right) */}
+            <Box
+              bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+              p={4}
+              borderRadius="md"
+              borderWidth="1px"
+              borderColor="brand.500"
+              boxShadow="sm"
+              minH="240px"
+              height="240px"
+            >
+              <VStack align="stretch" spacing={3} width="100%">
+                <Select.Root
+                  collection={participantModelCollection}
+                  size="sm"
+                  width="100%"
+                  value={participantModelFilter ? [participantModelFilter] : []}
+                  onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
+                >
+                  <Select.HiddenSelect name="participant-model-filter" />
+                  <Select.Label>Filter by participant model</Select.Label>
+                  <Select.Control
+                    bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                    borderWidth="1px"
+                    borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                    borderRadius="md"
+                  >
+                    <Select.Trigger>
+                      <Select.ValueText placeholder="Filter by participant model" />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {participantModelCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
+
+                <VStack spacing={1} align="stretch" width="100%">
+                  <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+                    Voltage range: {voltageRange[0]}V – {voltageRange[1]}V
+                  </Text>
+                  <Slider.Root
+                    value={voltageRange}
+                    onValueChange={(details) => setVoltageRange(details.value)}
+                    min={Math.min(voltageRange[0], voltageRange[1], 0)}
+                    max={Math.max(voltageRange[0], voltageRange[1], 450)}
+                    step={5}
+                  >
+                    <Slider.Control>
+                      <Slider.Track>
+                        <Slider.Range />
+                      </Slider.Track>
+                      <Slider.Thumb index={0}>
+                        <Slider.HiddenInput />
+                      </Slider.Thumb>
+                      <Slider.Thumb index={1}>
+                        <Slider.HiddenInput />
+                      </Slider.Thumb>
+                    </Slider.Control>
+                  </Slider.Root>
+                </VStack>
+
+                <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+                  Select conversation
+                </Text>
+                <HStack spacing={2} align="center">
+                  <Box flex="1">
+                    <Select.Root
+                      collection={conversationCollection}
+                      size="sm"
+                      width="100%"
+                      value={selectedConversationId ? [selectedConversationId] : []}
+                      onValueChange={(details) => {
+                        const id = details.value[0] || '';
+                        if (id && id !== selectedConversationId) {
+                          resetPlaybackState();
+                          setSelectedConversationId(id);
+                          loadConversationById(id);
+                        }
+                      }}
+                    >
+                      <Select.HiddenSelect name="conversation-select" />
+                      <Select.Control
+                        bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                        borderWidth="1px"
+                        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                        borderRadius="md"
+                      >
+                        <Select.Trigger>
+                          <Select.ValueText placeholder="Select conversation" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                          <Select.Indicator />
+                        </Select.IndicatorGroup>
+                      </Select.Control>
+                      <Portal>
+                        <Select.Positioner>
+                          <Select.Content>
+                            {conversationCollection.items.map((item) => (
+                              <Select.Item item={item} key={item.value}>
+                                {item.label}
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Portal>
+                    </Select.Root>
+                  </Box>
+                  <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                </HStack>
+              </VStack>
+            </Box>
+          </VStack>
+        </HStack>
+      )}
 
       <audio ref={audioRef} />
     </Box>

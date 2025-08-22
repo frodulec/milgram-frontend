@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Box, HStack, VStack, Text, IconButton } from '@chakra-ui/react';
+import { Box, HStack, VStack, Text, IconButton, useBreakpointValue } from '@chakra-ui/react';
 import { LuPin, LuPinOff } from 'react-icons/lu';
 
 const MessageHistory = ({
@@ -10,6 +10,7 @@ const MessageHistory = ({
   onToggleFollow,
 }) => {
   const messageRefs = useRef({});
+  const height = useBreakpointValue({ base: '100%', md: '600px' });
 
   // Scroll to the current message when currentSyncIndex changes
   useEffect(() => {
@@ -35,8 +36,8 @@ const MessageHistory = ({
       bg={colorMode === 'light' ? "brand.50" : "gray.800"}
       p={4}
       borderRadius="md"
-      height="600px"
-      maxHeight="600px"
+      height={height}
+      maxHeight={height}
       overflowY="auto"
       borderWidth="1px"
       borderColor="brand.500"

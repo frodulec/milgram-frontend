@@ -1,11 +1,13 @@
 import React from 'react';
-import { Box, Image, Text } from '@chakra-ui/react';
+import { Box, Image, Text, useBreakpointValue } from '@chakra-ui/react';
 
 const ImageDisplay = ({ currentImage, colorMode }) => {
+  const height = useBreakpointValue({ base: '100%', md: '600px' });
+
   return (
     <Box
       textAlign="center"
-      height="600px"
+      height={height}
       width="100%"
       bg={colorMode === 'light' ? "brand.50" : "gray.800"}
       borderRadius="md"
