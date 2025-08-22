@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Box, HStack, VStack, Text, IconButton, useBreakpointValue, Button } from '@chakra-ui/react';
+import { Box, HStack, VStack, Text, IconButton, useBreakpointValue } from '@chakra-ui/react';
 import { LuPin, LuPinOff } from 'react-icons/lu';
 
 const MessageHistory = ({

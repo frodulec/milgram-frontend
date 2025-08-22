@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button, useBreakpointValue, SimpleGrid } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button, useBreakpointValue } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';

@@ -36,6 +36,10 @@ const ImageDisplay = ({ currentImage, colorMode }) => {
             maxW="100%"
             objectFit="scale-down"
             margin="auto"
+            loading="lazy"
+            onError={(e) => {
+              console.error('Image failed to load:', e);
+            }}
           />
         </Box>
       ) : (

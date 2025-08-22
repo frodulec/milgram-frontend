@@ -3,36 +3,39 @@ import {
   FabricText,
   FabricImage
 } from 'fabric';
-import professorSprite from '../assets/professor_w.png';
-import learnerSprite from '../assets/learner.png';
-import participantSprite from '../assets/student.png';
-import shockSprite from '../assets/electricity.png';
-import backgroundImage from '../assets/background.jpg'
-import speechBubble from '../assets/speech_bubble.png';
+import professorSprite from '../assets/optimized/professor_w.png';
+import learnerSprite from '../assets/optimized/learner.png';
+import participantSprite from '../assets/optimized/student.png';
+import shockSprite from '../assets/optimized/electricity.png';
+import backgroundImage from '../assets/optimized/background.jpg'
+import speechBubble from '../assets/optimized/speech_bubble.png';
+import { imageCache } from '../utils/imageCache';
 
 export class ImageGenerator {
   constructor() {
     const canvasEl = document.createElement('canvas');
-    canvasEl.width = 1024;
-    canvasEl.height = 1024;
+    canvasEl.width = 1024;  // Reduced from 1024 for better mobile performance
+    canvasEl.height = 1024; // Reduced from 1024 for better mobile performance
 
     this.canvas = new StaticCanvas(canvasEl, {
       width: 1024,
       height: 1024,
-      backgroundColor: '#F0F0F0'
+      backgroundColor: '#F0F0F0',
+      renderOnAddRemove: false, // Improve performance
+      skipTargetFind: true      // Skip unnecessary calculations
     });
 
     this.professorPos = { x: 700, y: 780 };
-    this.professorScale = { x: 0.7, y: 0.7 };
+    this.professorScale = { x: 0.23, y: 0.23 };
 
     this.shockPos = { x: 700, y: 400 };
-    this.shockScale = { x: 0.075, y: 0.075 };
+    this.shockScale = { x: 0.15, y: 0.15 };
 
     this.learnerPos = { x: 710, y: 380 };
-    this.learnerScale = { x: 1.05, y: 1.05 };
+    this.learnerScale = { x: 0.18, y: 0.18 };
 
     this.participantPos = { x: 400, y: 780 };
-    this.participantScale = { x: 0.17, y: 0.17 };
+    this.participantScale = { x: 0.23, y: 0.23 };
 
     this.sprites = {};
     this.loadSprites();
@@ -102,6 +105,13 @@ export class ImageGenerator {
 
 
   async generateImage(params) {
+    // Check cache first
+    const cacheKey = imageCache.generateKey(params);
+    const cachedBlob = imageCache.get(cacheKey);
+    if (cachedBlob) {
+      return cachedBlob;
+    }
+
     // Wait for sprites to load if they haven't already
     try {
       if (!this.sprites.professor || !this.sprites.learner || !this.sprites.participant) {
@@ -146,7 +156,11 @@ export class ImageGenerator {
 
       return new Promise((resolve) => {
         this.canvas.renderAll();
-        this.canvas.lowerCanvasEl.toBlob(resolve);
+        this.canvas.lowerCanvasEl.toBlob((blob) => {
+          // Cache the generated image
+          imageCache.set(cacheKey, blob);
+          resolve(blob);
+        }, 'image/jpeg', 0.8); // Use JPEG with 80% quality for smaller file size
       });
     } catch (error) {
       console.error('Error generating image:', error);
@@ -160,7 +174,7 @@ export class ImageGenerator {
       ctx.fillRect(0, 0, 1024, 1024);
 
       return new Promise((resolve) => {
-        fallbackCanvas.toBlob(resolve);
+        fallbackCanvas.toBlob(resolve, 'image/jpeg', 0.8);
       });
     }
   }

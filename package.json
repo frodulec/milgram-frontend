@@ -26,9 +26,13 @@
     "recharts": "^2.15.3",
     "socket.io-client": "^4.8.1"
   },
+  "devDependencies": {
+    "sharp": "^0.32.6"
+  },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run optimize-images && react-scripts build",
+    "optimize-images": "node optimize-images.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

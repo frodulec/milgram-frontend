@@ -13,7 +13,7 @@ RUN npm ci --only=production
 # Copy source code
 COPY . .
 
-# Build the React application
+# Build the React application with optimizations
 RUN npm run build
 
 # Production stage - use nginx to serve static files
@@ -41,6 +41,7 @@ RUN echo 'server { \
     gzip on; \
     gzip_vary on; \
     gzip_min_length 1024; \
+    gzip_comp_level 6; \
     gzip_types \
         text/plain \
         text/css \
@@ -48,7 +49,16 @@ RUN echo 'server { \
         text/javascript \
         application/javascript \
         application/xml+rss \
-        application/json; \
+        application/json \
+        image/svg+xml \
+        application/x-font-ttf \
+        font/opentype; \
+    \
+    # Cache static assets \
+    location ~* \\.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ { \
+        expires 1y; \
+        add_header Cache-Control "public, immutable"; \
+    } \
 }' > /etc/nginx/conf.d/default.conf
 
 # Expose port 80
