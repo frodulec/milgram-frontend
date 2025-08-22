@@ -81,12 +81,11 @@ useEffect(() => {
       <HStack
         justifyContent="space-between"
         alignItems="center"
-        mb={3}
+        // mb={3}
         position="sticky"
         top="0"
         bg={colorMode === 'light' ? "brand.50" : "gray.800"}
         zIndex="1"
-        p={2}
         borderTopRadius="md"
       >
         {/* Header content remains the same */}

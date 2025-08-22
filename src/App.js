@@ -28,7 +28,7 @@ function App() {
   const eventSourceRef = useRef(null);
   const messageRefs = useRef(new Map());
 
-  // Use our audio player hook
+  // Use our audio player hook (without resetPlaybackState dependency)
   const {
     isPlaying,
     isMuted,
@@ -51,6 +51,19 @@ function App() {
     setCurrentSyncIndex,
     isStarted
   });
+
+  // Define resetPlaybackState function after the hook
+  const resetPlaybackState = useCallback(() => {
+    // Stop any ongoing streams
+    if (eventSourceRef.current) {
+      try { eventSourceRef.current.close(); } catch (_) { }
+      eventSourceRef.current = null;
+    }
+
+    setMessages([]);
+    setSyncQueue([]);
+    setCurrentSyncIndex(-1);
+  }, []);
 
   useEffect(() => {
     const loadDefaultImage = async () => {
@@ -130,7 +143,7 @@ function App() {
       loadConversationById(firstId);
     } else {
       setSelectedConversationId('');
-      resetPlaybackState();
+      resetPlaybackStateComplete();
     }
   };
 
@@ -159,7 +172,7 @@ function App() {
       setSelectedConversationId(filteredConversations[0]?.id || '');
       if (filteredConversations.length === 0) {
         // Clear current playback when no conversations match the filters
-        resetPlaybackState();
+        resetPlaybackStateComplete();
       }
     }
   }, [participantModelFilter, allConversations, filteredConversations, selectedConversationId]);
@@ -233,19 +246,14 @@ function App() {
     });
   };
 
-  const resetPlaybackState = () => {
-    // Stop any ongoing streams
-    if (eventSourceRef.current) {
-      try { eventSourceRef.current.close(); } catch (_) { }
-      eventSourceRef.current = null;
-    }
+  // Extend the resetPlaybackState function to include audio player reset and image reloading
+  const resetPlaybackStateComplete = useCallback(() => {
+    // First call the basic reset
+    resetPlaybackState();
+
     // Reset audio player state and UI
     resetAudioPlayer();
     setIsStarted(false);
-
-    setMessages([]);
-    setSyncQueue([]);
-    setCurrentSyncIndex(-1);
 
     // Load a fresh default image again after clearing
     (async () => {
@@ -257,7 +265,7 @@ function App() {
         console.error('Failed to generate default image on reset:', error);
       }
     })();
-  };
+  }, [resetPlaybackState, resetAudioPlayer, setCurrentImage]);
 
   const loadConversationById = (conversationId) => {
     if (!conversationId) return;
@@ -265,7 +273,7 @@ function App() {
     if (!conv) return;
 
     // Reset and load messages
-    resetPlaybackState();
+    resetPlaybackStateComplete();
 
     const incomingMessages = Array.isArray(conv.messages) ? conv.messages : [];
     const normalized = incomingMessages.map(m => ({
@@ -401,7 +409,7 @@ function App() {
 
   return (
     <Box p={4} maxW="1200px" mx="auto">
-      <HStack justifyContent="flex-end" alignItems="center" py={4} mb={4}>
+      <HStack justifyContent="flex-end" alignItems="center" mb={4}>
         <IconButton
           onClick={toggleColorMode}
           variant="outline"
@@ -411,58 +419,58 @@ function App() {
         </IconButton>
       </HStack>
 
-{isMobile ? (
-  /* Mobile Layout - Vertical stack with two main tiles */
-  <VStack align="stretch" spacing={4}>
-    {/* Mobile Tile 1: Image and Conversation History */}
-    <VStack
-      align="stretch"
-      spacing={4}
-      bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-      p={4}
-      borderRadius="md"
-      borderWidth="1px"
-      borderColor="brand.500"
-      boxShadow="md"
-    >
-      {/* Image Display */}
-      <Box minH="300px">
-        <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
-      </Box>
-    </VStack>
-
-    {/* Conversation History as separate tile */}
-    <Box minH="300px" maxH="400px" overflow="auto">
-      {filteredConversations.length === 0 ? (
-        <Box
-          bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-          p={4}
-          borderRadius="md"
-          height="100%"
-          borderWidth="1px"
-          borderColor="brand.500"
-          boxShadow="md"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <VStack spacing={3}>
-            <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
-              No conversations with selected filters
-            </Text>
-            <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+      {isMobile ? (
+        /* Mobile Layout - Vertical stack with two main tiles */
+        <VStack align="stretch" spacing={4}>
+          {/* Mobile Tile 1: Image and Conversation History */}
+          <VStack
+            align="stretch"
+            spacing={4}
+            bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="brand.500"
+            boxShadow="md"
+          >
+            {/* Image Display */}
+            <Box minH="300px">
+              <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+            </Box>
           </VStack>
-        </Box>
-      ) : (
-        <MessageHistory
-          messages={messages}
-          currentSyncIndex={currentSyncIndex}
-          colorMode={colorMode}
-          followCurrentMessage={followCurrentMessage}
-          onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
-        />
-      )}
-    </Box>
+
+          {/* Conversation History as separate tile */}
+          <Box minH="300px" maxH="400px" overflow="auto">
+            {filteredConversations.length === 0 ? (
+              <Box
+                bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+                p={4}
+                borderRadius="md"
+                height="100%"
+                borderWidth="1px"
+                borderColor="brand.500"
+                boxShadow="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <VStack spacing={3}>
+                  <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
+                    No conversations with selected filters
+                  </Text>
+                  <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                </VStack>
+              </Box>
+            ) : (
+              <MessageHistory
+                messages={messages}
+                currentSyncIndex={currentSyncIndex}
+                colorMode={colorMode}
+                followCurrentMessage={followCurrentMessage}
+                onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+              />
+            )}
+          </Box>
 
           {/* Mobile Tile 2: Conversation Filtering and Audio Controls */}
           <VStack
@@ -551,7 +559,7 @@ function App() {
                     onValueChange={(details) => {
                       const id = details.value[0] || '';
                       if (id && id !== selectedConversationId) {
-                        resetPlaybackState();
+                        resetPlaybackStateComplete();
                         setSelectedConversationId(id);
                         loadConversationById(id);
                       }
@@ -765,9 +773,8 @@ function App() {
                       width="100%"
                       value={selectedConversationId ? [selectedConversationId] : []}
                       onValueChange={(details) => {
-                        const id = details.value[0] || '';
-                        if (id && id !== selectedConversationId) {
-                          resetPlaybackState();
+                        const id = details.value[0] || ''; if (id && id !== selectedConversationId) {
+                          resetPlaybackStateComplete();
                           setSelectedConversationId(id);
                           loadConversationById(id);
                         }

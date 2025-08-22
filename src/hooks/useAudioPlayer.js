@@ -21,33 +21,27 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
         setIsManuallyPaused(false);
       }
     } else {
-      console.log('No more items in sync queue');
+      // We've reached the end of the queue - stop playback completely
       setIsPlaying(false);
-      setIsManuallyPaused(false);
-      if (nextIndex === syncQueue.length && syncQueue.length > 0) {
-        console.log('Experience completed');
-      }
+      setIsManuallyPaused(true); // Prevent auto-restart
+      // Don't change currentSyncIndex to avoid triggering restart
     }
   }, [syncQueue, currentSyncIndex, setCurrentSyncIndex]);
 
 
   const playPreviousItem = useCallback(() => {
-    const nextIndex = currentSyncIndex - 1;
+    const previousIndex = currentSyncIndex - 1;
 
-    if (nextIndex < syncQueue.length) {
-      const nextItem = syncQueue[nextIndex];
-      if (nextItem && nextItem.isProcessed) {
-        setCurrentSyncIndex(nextIndex);
+    if (previousIndex >= 0 && previousIndex < syncQueue.length) {
+      const previousItem = syncQueue[previousIndex];
+      if (previousItem && previousItem.isProcessed) {
+        setCurrentSyncIndex(previousIndex);
         setIsPlaying(false);
         setIsManuallyPaused(false);
       }
     } else {
-      console.log('No more items in sync queue');
       setIsPlaying(false);
       setIsManuallyPaused(false);
-      if (nextIndex === syncQueue.length && syncQueue.length > 0) {
-        console.log('Experience completed');
-      }
     }
   }, [syncQueue, currentSyncIndex, setCurrentSyncIndex]);
 
@@ -82,6 +76,11 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
       const audioUrl = URL.createObjectURL(currentItem.audioBlob);
       audio.src = audioUrl;
 
+      // Store the cleanup function for this audio URL
+      const cleanupAudioUrl = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+
       // Wait for the audio to be loaded before playing
       audio.onloadeddata = () => {
         // Only attempt to play if we're still in a playing state
@@ -91,16 +90,15 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
             if (error.name !== 'AbortError') {
               console.error('Failed to play audio:', error);
               setIsPlaying(false);
+              cleanupAudioUrl();
               playNextItem();
             }
           });
         }
       };
 
-      // Clean up the blob URL when the audio is done
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-      };
+      // Store cleanup function so it can be called later
+      audio.dataset.cleanupUrl = audioUrl;
     }
   }, [syncQueue, currentSyncIndex, playNextItem, isManuallyPaused]);
 
@@ -116,6 +114,7 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
 
   // Main autoplay effect
   useEffect(() => {
+    // Only auto-play if we haven't reached the end of the queue
     if (!isPlaying && !isManuallyPaused && syncQueue.length > 0 && currentSyncIndex >= 0 && currentSyncIndex < syncQueue.length) {
       const currentItem = syncQueue[currentSyncIndex];
       if (currentItem && currentItem.isProcessed && isStarted) {
@@ -143,6 +142,18 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
 
     const handleEnded = () => {
       setIsPlaying(false);
+      // Clean up the current audio URL if it exists
+      if (audio.dataset.cleanupUrl) {
+        URL.revokeObjectURL(audio.dataset.cleanupUrl);
+        delete audio.dataset.cleanupUrl;
+      }
+      // Check if we're at the last item to prevent infinite loop
+      const nextIndex = currentSyncIndex + 1;
+      if (nextIndex >= syncQueue.length) {
+        console.log('Reached end of conversation - stopping playback');
+        setIsManuallyPaused(true); // Prevent auto-restart
+        return;
+      }
       setIsManuallyPaused(false);
       playNextItem();
     };
