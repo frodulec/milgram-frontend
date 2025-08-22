@@ -521,15 +521,14 @@ export class ImageGenerator {
   }
 
 
-  // Sanitize text for speech bubbles: remove special characters and newlines/tabs
+  // Sanitize text for speech bubbles: preserve punctuation but remove invisible characters
   sanitizeText(text) {
     const original = typeof text === 'string' ? text : String(text ?? '');
-    // Normalize to split accented characters into base + diacritics, then strip diacritics
-    const withoutDiacritics = original.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
-    // Remove all characters except letters, numbers and whitespace
-    const alnumAndSpaceOnly = withoutDiacritics.replace(/[^a-zA-Z0-9\s]/g, '');
-    // Collapse all whitespace (including newlines/tabs) to single spaces and trim
-    const collapsed = alnumAndSpaceOnly.replace(/\s+/g, ' ').trim();
+    // Remove only invisible characters: newlines, tabs, and other non-visible characters
+    // Preserve letters, numbers, spaces, and punctuation (dots, question marks, etc.)
+    const cleanedText = original.replace(/[\n\r\t\u0000-\u001F\u007F-\u009F]/g, ' ');
+    // Collapse multiple spaces to single spaces and trim
+    const collapsed = cleanedText.replace(/\s+/g, ' ').trim();
     return collapsed;
   }
 
