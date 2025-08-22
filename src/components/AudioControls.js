@@ -48,20 +48,20 @@ const AudioControls = ({
       alignItems="center"
     >
       <Box maxW="720px" width={removeNestedBoxStyling ? "100%" : "80%"} mx="auto">
-        <Text
-          fontSize="md"
+        {/* <Text
+          fontSize="lg"
           fontWeight="bold"
           mb={2}
           textAlign="center"
           color={colorMode === 'light' ? "semantic.text" : "white"}
         >
           Playback Controls
-        </Text>
+        </Text> */}
 
         {/* Playback Controls */}
         <HStack spacing={2} mb={3} justifyContent="center">
           <IconButton
-            size="sm"
+            size="lg"
             onClick={onPrevious}
             isDisabled={currentSyncIndex <= 0}
             aria-label="Previous"
@@ -75,7 +75,7 @@ const AudioControls = ({
               colorScheme="brand"
               bg="brand.500"
               color="white"
-              size="sm"
+              size="lg"
               minW="160px"
               onClick={handlePlaybackControl}
             >
@@ -85,7 +85,7 @@ const AudioControls = ({
 
           {!hidePlayPauseButton && (
             <IconButton
-              size="sm"
+              size="lg"
               onClick={onPlayPause}
               isDisabled={currentSyncIndex === -1}
               aria-label={isPlaying ? "Pause" : "Play"}
@@ -95,7 +95,7 @@ const AudioControls = ({
             </IconButton>
           )}
           <IconButton
-            size="sm"
+            size="lg"
             onClick={onNext}
             isDisabled={currentSyncIndex >= totalItems - 1}
             aria-label="Next"
@@ -104,7 +104,7 @@ const AudioControls = ({
             <FaForward />
           </IconButton>
           <IconButton
-            size="sm"
+            size="lg"
             onClick={onMute}
             aria-label={isMuted ? "Unmute" : "Mute"}
             colorScheme="brand"

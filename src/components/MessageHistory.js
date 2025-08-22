@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Box, HStack, VStack, Text, IconButton, useBreakpointValue } from '@chakra-ui/react';
+import { Box, HStack, VStack, Text, IconButton, useBreakpointValue, Button } from '@chakra-ui/react';
 import { LuPin, LuPinOff } from 'react-icons/lu';
 
 const MessageHistory = ({
@@ -10,27 +10,61 @@ const MessageHistory = ({
   onToggleFollow,
 }) => {
   const messageRefs = useRef({});
-  const height = useBreakpointValue({ base: '100%', md: '600px' });
+  const messageBoxRef = useRef({});
+  const scrollableBoxRef = useRef(null); // New ref for the scrollable Box
+
+  const height = useBreakpointValue({ base: '400px', md: '600px' });
 
   // Scroll to the current message when currentSyncIndex changes
-  useEffect(() => {
-    if (followCurrentMessage &&
-      currentSyncIndex !== null &&
-      currentSyncIndex >= 0 &&
-      messageRefs.current[currentSyncIndex]) {
-      messageRefs.current[currentSyncIndex].scrollIntoView({
-        behavior: 'smooth',
-        block: 'center' // Center the message in the viewport
-      });
-    }
-  }, [currentSyncIndex, followCurrentMessage]);
+useEffect(() => {
+  if (followCurrentMessage &&
+    currentSyncIndex !== null &&
+    currentSyncIndex >= 0 &&
+    messageRefs.current[currentSyncIndex] &&
+    scrollableBoxRef.current &&
+    messageBoxRef.current) {
+    
+    const messageElement = messageRefs.current[currentSyncIndex];
+    const container = scrollableBoxRef.current;
+    const outerContainer = messageBoxRef.current;
+    
+    // Get the position of the message relative to the scrollable container
+    const messageTop = messageElement.offsetTop;
+    const messageHeight = messageElement.offsetHeight;
+    
+    // Use the outer container height for centering calculation
+    const outerContainerHeight = outerContainer.clientHeight;
+    // Account for the sticky header height
+    const headerHeight = 60; // Approximate height of the sticky header
+    const availableHeight = outerContainerHeight - headerHeight;
+    
+    // Calculate scroll position to center the message in the outer container
+    const scrollTo = messageTop - (availableHeight / 2) + (messageHeight / 2);
+    
+    container.scrollTo({
+      top: scrollTo,
+      behavior: 'smooth'
+    });
+  }
+}, [currentSyncIndex, followCurrentMessage]);
 
+
+  // // Handle scroll up/down button clicks
+  // const handleScroll = (direction) => {
+  //   if (scrollableBoxRef.current) {
+  //     const scrollAmount = direction === 'up' ? -50 : 50;
+  //     scrollableBoxRef.current.scrollTop += scrollAmount;
+  //   }
+  // };
   if (!Array.isArray(messages)) {
     console.error("MessageHistory: 'messages' prop is not an array. Received:", messages);
     return null;
   }
 
   return (
+    <HStack>
+
+
     <VStack
       width="100%"
       bg={colorMode === 'light' ? "brand.50" : "gray.800"}
@@ -42,6 +76,7 @@ const MessageHistory = ({
       borderWidth="1px"
       borderColor="brand.500"
       boxShadow="md"
+      ref={messageBoxRef}
     >
       <HStack
         justifyContent="space-between"
@@ -75,9 +110,9 @@ const MessageHistory = ({
       <Box
         height={"100%"}
         width={"100%"}
-        overflow={"auto"}>
-
-
+        overflow={"auto"}
+        ref={scrollableBoxRef}
+        >
         {messages.map((message, index) => {
           const isCurrentlyPlaying = index === currentSyncIndex;
 
@@ -119,6 +154,7 @@ const MessageHistory = ({
         })}
       </Box>
     </VStack>
+    </HStack>
   );
 };
 

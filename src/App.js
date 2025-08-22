@@ -411,58 +411,58 @@ function App() {
         </IconButton>
       </HStack>
 
-      {isMobile ? (
-        /* Mobile Layout - Vertical stack with two main tiles */
-        <VStack align="stretch" spacing={4}>
-          {/* Mobile Tile 1: Image and Conversation History */}
-          <VStack
-            align="stretch"
-            spacing={4}
-            bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-            p={4}
-            borderRadius="md"
-            borderWidth="1px"
-            borderColor="brand.500"
-            boxShadow="md"
-          >
-            {/* Image Display */}
-            <Box minH="300px" maxH="400px">
-              <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
-            </Box>
+{isMobile ? (
+  /* Mobile Layout - Vertical stack with two main tiles */
+  <VStack align="stretch" spacing={4}>
+    {/* Mobile Tile 1: Image and Conversation History */}
+    <VStack
+      align="stretch"
+      spacing={4}
+      bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+      p={4}
+      borderRadius="md"
+      borderWidth="1px"
+      borderColor="brand.500"
+      boxShadow="md"
+    >
+      {/* Image Display */}
+      <Box minH="300px">
+        <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+      </Box>
+    </VStack>
 
-            {/* Conversation History below image */}
-            <Box minH="300px" maxH="400px" overflow="auto">
-              {filteredConversations.length === 0 ? (
-                <Box
-                  bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-                  p={4}
-                  borderRadius="md"
-                  height="100%"
-                  borderWidth="1px"
-                  borderColor="brand.500"
-                  boxShadow="md"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <VStack spacing={3}>
-                    <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
-                      No conversations with selected filters
-                    </Text>
-                    <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
-                  </VStack>
-                </Box>
-              ) : (
-                <MessageHistory
-                  messages={messages}
-                  currentSyncIndex={currentSyncIndex}
-                  colorMode={colorMode}
-                  followCurrentMessage={followCurrentMessage}
-                  onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
-                />
-              )}
-            </Box>
+    {/* Conversation History as separate tile */}
+    <Box minH="300px" maxH="400px" overflow="auto">
+      {filteredConversations.length === 0 ? (
+        <Box
+          bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+          p={4}
+          borderRadius="md"
+          height="100%"
+          borderWidth="1px"
+          borderColor="brand.500"
+          boxShadow="md"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <VStack spacing={3}>
+            <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
+              No conversations with selected filters
+            </Text>
+            <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
           </VStack>
+        </Box>
+      ) : (
+        <MessageHistory
+          messages={messages}
+          currentSyncIndex={currentSyncIndex}
+          colorMode={colorMode}
+          followCurrentMessage={followCurrentMessage}
+          onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+        />
+      )}
+    </Box>
 
           {/* Mobile Tile 2: Conversation Filtering and Audio Controls */}
           <VStack
