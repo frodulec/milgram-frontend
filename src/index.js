@@ -10,7 +10,8 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ColorModeProvider
-      defaultTheme="light"
+
+      defaultTheme="dark"
       enableSystem={false}
     >
       <ChakraProvider value={system}> {/* Make sure we're using value={system} */}
