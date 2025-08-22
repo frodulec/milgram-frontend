@@ -21,7 +21,8 @@ const AudioControls = ({
   isStarted = false,
   runPlaybackFunc = null,
   tileMinHeight = null,
-  tileHeight = null
+  tileHeight = null,
+  removeNestedBoxStyling = false
 }) => {
   // Make sure to use runPlaybackFunc if provided, otherwise fallback to onPlayPause
   const handlePlaybackControl = () => {
@@ -35,18 +36,18 @@ const AudioControls = ({
   // Then in your button:
   return (
     <Box
-      bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-      p={4}
-      borderRadius="md"
-      borderWidth="1px"
-      borderColor="brand.500"
-      boxShadow="sm"
+      bg={removeNestedBoxStyling ? 'transparent' : (colorMode === 'light' ? "brand.50" : "gray.800")}
+      p={removeNestedBoxStyling ? 0 : 4}
+      borderRadius={removeNestedBoxStyling ? 'none' : "md"}
+      borderWidth={removeNestedBoxStyling ? 0 : "1px"}
+      borderColor={removeNestedBoxStyling ? 'transparent' : "brand.500"}
+      boxShadow={removeNestedBoxStyling ? 'none' : "sm"}
       minH={tileMinHeight || undefined}
       height={tileHeight || undefined}
       display="flex"
       alignItems="center"
     >
-      <Box maxW="720px" width="80%" mx="auto">
+      <Box maxW="720px" width={removeNestedBoxStyling ? "100%" : "80%"} mx="auto">
         <Text
           fontSize="md"
           fontWeight="bold"

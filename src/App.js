@@ -590,29 +590,28 @@ function App() {
             </VStack>
 
             {/* Audio Controls below filtering */}
-            <Box width="100%">
-              <AudioControls
-                isPlaying={isPlaying}
-                isMuted={isMuted}
-                volume={volume}
-                playbackRate={playbackRate}
-                currentSyncIndex={currentSyncIndex}
-                totalItems={syncQueue.length}
-                onPlayPause={togglePlayPause}
-                onPrevious={playPreviousItem}
-                onNext={playNextItem}
-                onMute={toggleMute}
-                onVolumeChange={handleVolumeChange}
-                onPlaybackRateChange={handlePlaybackRateChange}
-                colorMode={colorMode}
-                isQueueEmpty={syncQueue.length === 0}
-                hidePlayPauseButton={true}
-                isStarted={isStarted}
-                runPlaybackFunc={() => startExperience({ new_conversation: false })}
-                tileMinHeight="200px"
-                tileHeight="auto"
-              />
-            </Box>
+            <AudioControls
+              isPlaying={isPlaying}
+              isMuted={isMuted}
+              volume={volume}
+              playbackRate={playbackRate}
+              currentSyncIndex={currentSyncIndex}
+              totalItems={syncQueue.length}
+              onPlayPause={togglePlayPause}
+              onPrevious={playPreviousItem}
+              onNext={playNextItem}
+              onMute={toggleMute}
+              onVolumeChange={handleVolumeChange}
+              onPlaybackRateChange={handlePlaybackRateChange}
+              colorMode={colorMode}
+              isQueueEmpty={syncQueue.length === 0}
+              hidePlayPauseButton={true}
+              isStarted={isStarted}
+              runPlaybackFunc={() => startExperience({ new_conversation: false })}
+              tileMinHeight="200px"
+              tileHeight="auto"
+              removeNestedBoxStyling={true}
+            />
           </VStack>
         </VStack>
       ) : (
