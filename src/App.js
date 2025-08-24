@@ -552,6 +552,83 @@ function App() {
           </Button>
         </VStack>
       </VStack>
+
+      {/* Audio Settings Section */}
+      <VStack align="stretch" spacing={3} width="100%">
+        <Text fontSize="md" fontWeight="bold" color={colorMode === 'light' ? "semantic.text" : "white"}>
+          Audio Settings
+        </Text>
+
+        {/* Volume Control */}
+        <HStack spacing={2}>
+          <Text
+            fontSize="sm"
+            minW="60px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            Volume:
+          </Text>
+          <Slider.Root
+            value={[volume]}
+            onValueChange={(details) => handleVolumeChange(details.value[0])}
+            min={0}
+            max={1}
+            step={0.1}
+            flex={1}
+          >
+            <Slider.Control>
+              <Slider.Track>
+                <Slider.Range />
+              </Slider.Track>
+              <Slider.Thumb>
+                <Slider.HiddenInput />
+              </Slider.Thumb>
+            </Slider.Control>
+          </Slider.Root>
+          <Text
+            fontSize="sm"
+            minW="30px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            {Math.round(volume * 100)}%
+          </Text>
+        </HStack>
+
+        {/* Playback Speed Control */}
+        <HStack spacing={2}>
+          <Text
+            fontSize="sm"
+            minW="60px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            Speed:
+          </Text>
+          <Slider.Root
+            value={[playbackRate]}
+            onValueChange={(details) => handlePlaybackRateChange(details.value[0])}
+            min={0.5}
+            max={4}
+            step={0.1}
+            flex={1}
+          >
+            <Slider.Control>
+              <Slider.Track>
+                <Slider.Range />
+              </Slider.Track>
+              <Slider.Thumb>
+                <Slider.HiddenInput />
+              </Slider.Thumb>
+            </Slider.Control>
+          </Slider.Root>
+          <Text
+            fontSize="sm"
+            minW="30px"
+            color={colorMode === 'light' ? "semantic.text" : "white"}
+          >
+            {playbackRate}x
+          </Text>
+        </HStack>
+      </VStack>
     </VStack>
   );
 
@@ -678,9 +755,10 @@ function App() {
             hidePlayPauseButton={true}
             isStarted={isStarted}
             runPlaybackFunc={() => startExperience({ new_conversation: false })}
-            tileMinHeight="200px"
-            tileHeight="auto"
+            tileMinHeight="120px"
+            tileHeight="120px"
             removeNestedBoxStyling={false}
+            hideVolumeAndSpeed={true}
           />
         </VStack>
       ) : (

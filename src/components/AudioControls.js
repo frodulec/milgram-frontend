@@ -22,7 +22,8 @@ const AudioControls = ({
   runPlaybackFunc = null,
   tileMinHeight = null,
   tileHeight = null,
-  removeNestedBoxStyling = false
+  removeNestedBoxStyling = false,
+  hideVolumeAndSpeed = false
 }) => {
   // Make sure to use runPlaybackFunc if provided, otherwise fallback to onPlayPause
   const handlePlaybackControl = () => {
@@ -46,6 +47,7 @@ const AudioControls = ({
       height={tileHeight || undefined}
       display="flex"
       alignItems="center"
+      justifyContent="center"
     >
       <Box maxW="720px" width={removeNestedBoxStyling ? "100%" : "80%"} mx="auto">
         {/* <Text
@@ -59,7 +61,7 @@ const AudioControls = ({
         </Text> */}
 
         {/* Playback Controls */}
-        <HStack spacing={2} mb={3} justifyContent="center">
+        <HStack spacing={2} mb={hideVolumeAndSpeed ? 0 : 3} justifyContent="center">
           <IconButton
             size="lg"
             onClick={onPrevious}
@@ -114,75 +116,80 @@ const AudioControls = ({
 
         </HStack>
 
-        {/* Volume Control */}
-        <HStack spacing={2} mb={2}>
-          <Text
-            fontSize="sm"
-            minW="60px"
-            color={colorMode === 'light' ? "semantic.text" : "white"}
-          >
-            Volume:
-          </Text>
-          <Slider.Root
-            value={[volume]}
-            onValueChange={(details) => onVolumeChange(details.value[0])}
-            min={0}
-            max={1}
-            step={0.1}
-            flex={1}
-          >
-            <Slider.Control>
-              <Slider.Track>
-                <Slider.Range />
-              </Slider.Track>
-              <Slider.Thumb>
-                <Slider.HiddenInput />
-              </Slider.Thumb>
-            </Slider.Control>
-          </Slider.Root>
-          <Text
-            fontSize="sm"
-            minW="30px"
-            color={colorMode === 'light' ? "semantic.text" : "white"}
-          >
-            {Math.round(volume * 100)}%
-          </Text>
-        </HStack>
+        {/* Volume and Speed Controls - Hidden in mobile when in sidebar */}
+        {!hideVolumeAndSpeed && (
+          <>
+            {/* Volume Control */}
+            <HStack spacing={2} mb={2}>
+              <Text
+                fontSize="sm"
+                minW="60px"
+                color={colorMode === 'light' ? "semantic.text" : "white"}
+              >
+                Volume:
+              </Text>
+              <Slider.Root
+                value={[volume]}
+                onValueChange={(details) => onVolumeChange(details.value[0])}
+                min={0}
+                max={1}
+                step={0.1}
+                flex={1}
+              >
+                <Slider.Control>
+                  <Slider.Track>
+                    <Slider.Range />
+                  </Slider.Track>
+                  <Slider.Thumb>
+                    <Slider.HiddenInput />
+                  </Slider.Thumb>
+                </Slider.Control>
+              </Slider.Root>
+              <Text
+                fontSize="sm"
+                minW="30px"
+                color={colorMode === 'light' ? "semantic.text" : "white"}
+              >
+                {Math.round(volume * 100)}%
+              </Text>
+            </HStack>
 
-        {/* Playback Speed Control */}
-        <HStack spacing={2}>
-          <Text
-            fontSize="sm"
-            minW="60px"
-            color={colorMode === 'light' ? "semantic.text" : "white"}
-          >
-            Speed:
-          </Text>
-          <Slider.Root
-            value={[playbackRate]}
-            onValueChange={(details) => onPlaybackRateChange(details.value[0])}
-            min={0.5}
-            max={4}
-            step={0.1}
-            flex={1}
-          >
-            <Slider.Control>
-              <Slider.Track>
-                <Slider.Range />
-              </Slider.Track>
-              <Slider.Thumb>
-                <Slider.HiddenInput />
-              </Slider.Thumb>
-            </Slider.Control>
-          </Slider.Root>
-          <Text
-            fontSize="sm"
-            minW="30px"
-            color={colorMode === 'light' ? "semantic.text" : "white"}
-          >
-            {playbackRate}x
-          </Text>
-        </HStack>
+            {/* Playback Speed Control */}
+            <HStack spacing={2}>
+              <Text
+                fontSize="sm"
+                minW="60px"
+                color={colorMode === 'light' ? "semantic.text" : "white"}
+              >
+                Speed:
+              </Text>
+              <Slider.Root
+                value={[playbackRate]}
+                onValueChange={(details) => onPlaybackRateChange(details.value[0])}
+                min={0.5}
+                max={4}
+                step={0.1}
+                flex={1}
+              >
+                <Slider.Control>
+                  <Slider.Track>
+                    <Slider.Range />
+                  </Slider.Track>
+                  <Slider.Thumb>
+                    <Slider.HiddenInput />
+                  </Slider.Thumb>
+                </Slider.Control>
+              </Slider.Root>
+              <Text
+                fontSize="sm"
+                minW="30px"
+                color={colorMode === 'light' ? "semantic.text" : "white"}
+              >
+                {playbackRate}x
+              </Text>
+            </HStack>
+          </>
+        )}
       </Box>
     </Box>
   );
