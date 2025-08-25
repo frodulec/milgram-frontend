@@ -4,6 +4,7 @@ FROM node:20-alpine AS build
 # Set working directory
 WORKDIR /app
 
+RUN npm install -g npm@11.5.2
 # Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
