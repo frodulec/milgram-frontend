@@ -502,7 +502,7 @@ function App() {
           </Slider.Root>
         </VStack>
 
-        <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+        {/* <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
           Select conversation
         </Text>
         <VStack spacing={2} align="stretch">
@@ -550,7 +550,7 @@ function App() {
           <Button colorScheme="brand" onClick={resetAllFilters} size="sm" width="100%">
             Reset filters
           </Button>
-        </VStack>
+        </VStack> */}
       </VStack>
 
       {/* Audio Settings Section */}
