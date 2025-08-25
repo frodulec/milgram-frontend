@@ -703,6 +703,79 @@ function App() {
             </Box>
           </VStack>
 
+          {/* Mobile Tile 2: Audio Controls Only */}
+          <AudioControls
+            isPlaying={isPlaying}
+            isMuted={isMuted}
+            volume={volume}
+            playbackRate={playbackRate}
+            currentSyncIndex={currentSyncIndex}
+            totalItems={syncQueue.length}
+            onPlayPause={togglePlayPause}
+            onPrevious={playPreviousItem}
+            onNext={playNextItem}
+            onMute={toggleMute}
+            onVolumeChange={handleVolumeChange}
+            onPlaybackRateChange={handlePlaybackRateChange}
+            colorMode={colorMode}
+            isQueueEmpty={syncQueue.length === 0}
+            hidePlayPauseButton={true}
+            isStarted={isStarted}
+            runPlaybackFunc={() => startExperience({ new_conversation: false })}
+            tileMinHeight="60px"
+            tileHeight="60px"
+            removeNestedBoxStyling={true}
+            hideVolumeAndSpeed={true}
+          />
+                          <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+                  Select conversation
+                </Text>
+                <HStack spacing={2} align="center">
+                  <Box flex="1">
+                    <Select.Root
+                      collection={conversationCollection}
+                      size="sm"
+                      width="100%"
+                      value={selectedConversationId ? [selectedConversationId] : []}
+                      onValueChange={(details) => {
+                        const id = details.value[0] || ''; if (id && id !== selectedConversationId) {
+                          resetPlaybackStateComplete();
+                          setSelectedConversationId(id);
+                          loadConversationById(id);
+                        }
+                      }}
+                    >
+                      <Select.HiddenSelect name="conversation-select" />
+                      <Select.Control
+                        bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                        borderWidth="1px"
+                        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                        borderRadius="md"
+                      >
+                        <Select.Trigger>
+                          <Select.ValueText placeholder="Select conversation" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                          <Select.Indicator />
+                        </Select.IndicatorGroup>
+                      </Select.Control>
+                      <Portal>
+                        <Select.Positioner>
+                          <Select.Content>
+                            {conversationCollection.items.map((item) => (
+                              <Select.Item item={item} key={item.value}>
+                                {item.label}
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Portal>
+                    </Select.Root>
+                  </Box>
+                  <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                </HStack>
+        
           {/* Conversation History as separate tile */}
           <Box minH="300px" maxH="400px" overflow="auto">
             {filteredConversations.length === 0 ? (
@@ -735,31 +808,6 @@ function App() {
               />
             )}
           </Box>
-
-          {/* Mobile Tile 2: Audio Controls Only */}
-          <AudioControls
-            isPlaying={isPlaying}
-            isMuted={isMuted}
-            volume={volume}
-            playbackRate={playbackRate}
-            currentSyncIndex={currentSyncIndex}
-            totalItems={syncQueue.length}
-            onPlayPause={togglePlayPause}
-            onPrevious={playPreviousItem}
-            onNext={playNextItem}
-            onMute={toggleMute}
-            onVolumeChange={handleVolumeChange}
-            onPlaybackRateChange={handlePlaybackRateChange}
-            colorMode={colorMode}
-            isQueueEmpty={syncQueue.length === 0}
-            hidePlayPauseButton={true}
-            isStarted={isStarted}
-            runPlaybackFunc={() => startExperience({ new_conversation: false })}
-            tileMinHeight="120px"
-            tileHeight="120px"
-            removeNestedBoxStyling={false}
-            hideVolumeAndSpeed={true}
-          />
         </VStack>
       ) : (
         /* Desktop Layout - Original horizontal layout */

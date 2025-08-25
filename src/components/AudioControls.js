@@ -50,15 +50,6 @@ const AudioControls = ({
       justifyContent="center"
     >
       <Box maxW="720px" width={removeNestedBoxStyling ? "100%" : "80%"} mx="auto">
-        {/* <Text
-          fontSize="lg"
-          fontWeight="bold"
-          mb={2}
-          textAlign="center"
-          color={colorMode === 'light' ? "semantic.text" : "white"}
-        >
-          Playback Controls
-        </Text> */}
 
         {/* Playback Controls */}
         <HStack spacing={2} mb={hideVolumeAndSpeed ? 0 : 3} justifyContent="center">
@@ -129,12 +120,13 @@ const AudioControls = ({
                 Volume:
               </Text>
               <Slider.Root
-                value={[volume]}
-                onValueChange={(details) => onVolumeChange(details.value[0])}
+                value={[volume || 0]}
+                onValueChange={(details) => onVolumeChange && onVolumeChange(details.value[0])}
                 min={0}
                 max={1}
                 step={0.1}
                 flex={1}
+                key={`volume-slider-${volume}`}
               >
                 <Slider.Control>
                   <Slider.Track>
@@ -150,7 +142,7 @@ const AudioControls = ({
                 minW="30px"
                 color={colorMode === 'light' ? "semantic.text" : "white"}
               >
-                {Math.round(volume * 100)}%
+                {Math.round((volume || 0) * 100)}%
               </Text>
             </HStack>
 
@@ -164,12 +156,13 @@ const AudioControls = ({
                 Speed:
               </Text>
               <Slider.Root
-                value={[playbackRate]}
-                onValueChange={(details) => onPlaybackRateChange(details.value[0])}
+                value={[playbackRate || 1]}
+                onValueChange={(details) => onPlaybackRateChange && onPlaybackRateChange(details.value[0])}
                 min={0.5}
                 max={4}
                 step={0.1}
                 flex={1}
+                key={`speed-slider-${playbackRate}`}
               >
                 <Slider.Control>
                   <Slider.Track>
@@ -185,7 +178,7 @@ const AudioControls = ({
                 minW="30px"
                 color={colorMode === 'light' ? "semantic.text" : "white"}
               >
-                {playbackRate}x
+                {playbackRate || 1}x
               </Text>
             </HStack>
           </>

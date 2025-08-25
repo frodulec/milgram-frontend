@@ -11,7 +11,7 @@ const MessageHistory = ({
 }) => {
   const messageRefs = useRef({});
   const messageBoxRef = useRef({});
-  const scrollableBoxRef = useRef(null); // New ref for the scrollable Box
+  const scrollableBoxRef = useRef(null);
 
   const height = useBreakpointValue({ base: '300px', md: '600px' });
 
@@ -49,13 +49,6 @@ const MessageHistory = ({
   }, [currentSyncIndex, followCurrentMessage]);
 
 
-  // // Handle scroll up/down button clicks
-  // const handleScroll = (direction) => {
-  //   if (scrollableBoxRef.current) {
-  //     const scrollAmount = direction === 'up' ? -50 : 50;
-  //     scrollableBoxRef.current.scrollTop += scrollAmount;
-  //   }
-  // };
   if (!Array.isArray(messages)) {
     console.error("MessageHistory: 'messages' prop is not an array. Received:", messages);
     return null;
@@ -63,8 +56,6 @@ const MessageHistory = ({
 
   return (
     <HStack>
-
-
       <VStack
         width="100%"
         bg={colorMode === 'light' ? "brand.50" : "gray.800"}
@@ -81,14 +72,12 @@ const MessageHistory = ({
         <HStack
           justifyContent="space-between"
           alignItems="center"
-          // mb={3}
           position="sticky"
           top="0"
           bg={colorMode === 'light' ? "brand.50" : "gray.800"}
           zIndex="1"
           borderTopRadius="md"
         >
-          {/* Header content remains the same */}
           <Text
             fontSize="lg"
             fontWeight="bold"
@@ -133,7 +122,6 @@ const MessageHistory = ({
                 boxShadow={isCurrentlyPlaying ? "md" : "xs"}
                 transition="all 0.2s ease-in-out"
               >
-                {/* Message content remains the same */}
                 <Text fontWeight="bold" color={
                   message.speaker === 'Professor' ? (colorMode === 'dark' ? 'brand.300' : 'brand.500') :
                     message.speaker === 'Learner' ? (colorMode === 'dark' ? 'teal.300' : 'teal.500') :
