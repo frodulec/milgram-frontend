@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button, useBreakpointValue } from '@chakra-ui/react';
-import { LuMoon, LuSun, LuMenu } from "react-icons/lu"
-import { DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerHeader, DrawerPositioner, DrawerRoot, DrawerTitle, DrawerTrigger } from '@chakra-ui/react'
+import { LuMoon, LuSun, LuSettings } from "react-icons/lu"
+import { DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerHeader, DrawerPositioner, DrawerRoot } from '@chakra-ui/react'
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
 import { fetchTTSAudio, getNewContersationEventSource, fetchAllConversations } from './services/apiService';
@@ -580,7 +580,7 @@ function App() {
               <Slider.Track>
                 <Slider.Range />
               </Slider.Track>
-              <Slider.Thumb>
+              <Slider.Thumb index={0}>
                 <Slider.HiddenInput />
               </Slider.Thumb>
             </Slider.Control>
@@ -615,7 +615,7 @@ function App() {
               <Slider.Track>
                 <Slider.Range />
               </Slider.Track>
-              <Slider.Thumb>
+                <Slider.Thumb index={0}>
                 <Slider.HiddenInput />
               </Slider.Thumb>
             </Slider.Control>
@@ -640,9 +640,9 @@ function App() {
           <IconButton
             onClick={() => setIsSidebarOpen(true)}
             variant="outline"
-            size="sm"
+            size="md"
           >
-            <LuMenu />
+            <LuSettings />
           </IconButton>
           <Text fontSize="lg" fontWeight="bold" color={colorMode === 'light' ? "semantic.text" : "white"}>
             Milgram Experiment
@@ -662,26 +662,26 @@ function App() {
       )}
 
       {/* Mobile Sidebar Drawer */}
-      {isMobile && (
-        <DrawerRoot
-          open={isSidebarOpen}
-          onOpenChange={(e) => setIsSidebarOpen(e.open)}
-          placement="left"
-          size="sm"
-        >
-          <DrawerBackdrop />
-          <DrawerPositioner>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerCloseTrigger />
-              </DrawerHeader>
-              <DrawerBody>
-                <SidebarContent />
-              </DrawerBody>
-            </DrawerContent>
-          </DrawerPositioner>
-        </DrawerRoot>
-      )}
+{isMobile && (
+  <DrawerRoot
+    open={isSidebarOpen}
+    onOpenChange={(e) => setIsSidebarOpen(e.open)}
+    placement="left"
+    size="sm"
+  >
+    <DrawerBackdrop />
+    <DrawerPositioner>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerCloseTrigger />
+        </DrawerHeader>
+        <DrawerBody>
+          {isSidebarOpen && <SidebarContent />}
+        </DrawerBody>
+      </DrawerContent>
+    </DrawerPositioner>
+  </DrawerRoot>
+)}
 
       {isMobile ? (
         /* Mobile Layout - Vertical stack with two main tiles */

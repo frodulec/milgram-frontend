@@ -69,7 +69,7 @@ const AudioControls = ({
               bg="brand.500"
               color="white"
               size="lg"
-              minW="160px"
+              minW="200px"
               onClick={handlePlaybackControl}
             >
               {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "Start Experiment"}

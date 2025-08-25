@@ -171,6 +171,33 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
     };
   }, [volume, isMuted, playbackRate, playNextItem]);
 
+  // Effect to handle browser/tab closing on mobile
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+
+    const handlePageHide = () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, []);
+
   const togglePlayPause = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || currentSyncIndex === -1 || syncQueue.length === 0) {
