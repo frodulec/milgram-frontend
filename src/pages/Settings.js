@@ -272,9 +272,9 @@ function Settings() {
                 <Text fontSize="sm" color="gray.600">
                   Pre-defined messages for quick access
                 </Text>
-                
+
                 {localSettings.messageTemplates.map((template, index) => (
-                  <HStack key={index}>
+                  <HStack key={`template-${index}-${template.substring(0, 20)}`}>
                     <Input value={template} isReadOnly flex="1" />
                     <Button
                       size="sm"

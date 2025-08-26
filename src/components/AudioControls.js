@@ -126,13 +126,14 @@ const AudioControls = ({
                 max={1}
                 step={0.1}
                 flex={1}
-                key={`volume-slider-${volume}`}
+                key="volume-slider"
+                thumbAlignment="center"
               >
                 <Slider.Control>
                   <Slider.Track>
                     <Slider.Range />
                   </Slider.Track>
-                  <Slider.Thumb>
+                  <Slider.Thumb index={0}>
                     <Slider.HiddenInput />
                   </Slider.Thumb>
                 </Slider.Control>
@@ -162,13 +163,14 @@ const AudioControls = ({
                 max={4}
                 step={0.1}
                 flex={1}
-                key={`speed-slider-${playbackRate}`}
+                key="speed-slider"
+                thumbAlignment="center"
               >
                 <Slider.Control>
                   <Slider.Track>
                     <Slider.Range />
                   </Slider.Track>
-                  <Slider.Thumb>
+                  <Slider.Thumb index={0}>
                     <Slider.HiddenInput />
                   </Slider.Thumb>
                 </Slider.Control>

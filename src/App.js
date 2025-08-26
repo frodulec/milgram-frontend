@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Slider, Text, Button, useBreakpointValue } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, createListCollection, Text, Button, useBreakpointValue } from '@chakra-ui/react';
 import { LuMoon, LuSun, LuSettings } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
@@ -7,7 +7,7 @@ import { fetchTTSAudio, getNewContersationEventSource, fetchAllConversations } f
 import ImageDisplay from './components/ImageDisplay';
 import AudioControls from './components/AudioControls';
 import MessageHistory from './components/MessageHistory';
-import Sidebar from './components/Sidebar';
+import { SidebarLayout } from './components/Sidebar';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
 
 function App() {
@@ -453,31 +453,30 @@ function App() {
         </HStack>
       )}
 
-      {/* Mobile Sidebar */}
-      {isMobile && (
-        <Sidebar
-          isMobile={true}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          colorMode={colorMode}
-          toggleColorMode={toggleColorMode}
-          participantModelFilter={participantModelFilter}
-          setParticipantModelFilter={setParticipantModelFilter}
-          voltageRange={voltageRange}
-          setVoltageRange={setVoltageRange}
-          selectedConversationId={selectedConversationId}
-          setSelectedConversationId={setSelectedConversationId}
-          volume={volume}
-          handleVolumeChange={handleVolumeChange}
-          playbackRate={playbackRate}
-          handlePlaybackRateChange={handlePlaybackRateChange}
-          participantModelCollection={participantModelCollection}
-          conversationCollection={conversationCollection}
-          resetAllFilters={resetAllFilters}
-          resetPlaybackStateComplete={resetPlaybackStateComplete}
-          loadConversationById={loadConversationById}
-        />
-      )}
+      {/* Unified Sidebar Layout - works for both mobile and desktop */}
+      <SidebarLayout
+        isMobile={isMobile}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        colorMode={colorMode}
+        toggleColorMode={toggleColorMode}
+        participantModelFilter={participantModelFilter}
+        setParticipantModelFilter={setParticipantModelFilter}
+        voltageRange={voltageRange}
+        setVoltageRange={setVoltageRange}
+        selectedConversationId={selectedConversationId}
+        setSelectedConversationId={setSelectedConversationId}
+        volume={volume}
+        handleVolumeChange={handleVolumeChange}
+        playbackRate={playbackRate}
+        handlePlaybackRateChange={handlePlaybackRateChange}
+        participantModelCollection={participantModelCollection}
+        conversationCollection={conversationCollection}
+        resetAllFilters={resetAllFilters}
+        resetPlaybackStateComplete={resetPlaybackStateComplete}
+        loadConversationById={loadConversationById}
+
+      />
 
       {isMobile ? (
         /* Mobile Layout - Vertical stack with two main tiles */
@@ -624,129 +623,7 @@ function App() {
               />
             )}
 
-            {/* Conversation selection controls (bottom right) */}
-            <Box
-              bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-              p={4}
-              borderRadius="md"
-              borderWidth="1px"
-              borderColor="brand.500"
-              boxShadow="sm"
-              minH="240px"
-              height="240px"
-            >
-              <VStack align="stretch" spacing={3} width="100%">
-                <Select.Root
-                  collection={participantModelCollection}
-                  size="sm"
-                  width="100%"
-                  value={participantModelFilter ? [participantModelFilter] : []}
-                  onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
-                >
-                  <Select.HiddenSelect name="participant-model-filter" />
-                  <Select.Label>Filter by participant model</Select.Label>
-                  <Select.Control
-                    bg={colorMode === 'light' ? 'white' : 'gray.700'}
-                    borderWidth="1px"
-                    borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                    borderRadius="md"
-                  >
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Filter by participant model" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {participantModelCollection.items.map((item) => (
-                          <Select.Item item={item} key={item.value}>
-                            {item.label}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
 
-                <VStack spacing={1} align="stretch" width="100%">
-                  <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
-                    Voltage range: {voltageRange[0]}V – {voltageRange[1]}V
-                  </Text>
-                  <Slider.Root
-                    value={voltageRange}
-                    onValueChange={(details) => setVoltageRange(details.value)}
-                    min={Math.min(voltageRange[0], voltageRange[1], 0)}
-                    max={Math.max(voltageRange[0], voltageRange[1], 450)}
-                    step={5}
-                  >
-                    <Slider.Control>
-                      <Slider.Track>
-                        <Slider.Range />
-                      </Slider.Track>
-                      <Slider.Thumb index={0}>
-                        <Slider.HiddenInput />
-                      </Slider.Thumb>
-                      <Slider.Thumb index={1}>
-                        <Slider.HiddenInput />
-                      </Slider.Thumb>
-                    </Slider.Control>
-                  </Slider.Root>
-                </VStack>
-
-                <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
-                  Select conversation
-                </Text>
-                <HStack spacing={2} align="center">
-                  <Box flex="1">
-                    <Select.Root
-                      collection={conversationCollection}
-                      size="sm"
-                      width="100%"
-                      value={selectedConversationId ? [selectedConversationId] : []}
-                      onValueChange={(details) => {
-                        const id = details.value[0] || ''; if (id && id !== selectedConversationId) {
-                          resetPlaybackStateComplete();
-                          setSelectedConversationId(id);
-                          loadConversationById(id);
-                        }
-                      }}
-                    >
-                      <Select.HiddenSelect name="conversation-select" />
-                      <Select.Control
-                        bg={colorMode === 'light' ? 'white' : 'gray.700'}
-                        borderWidth="1px"
-                        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                        borderRadius="md"
-                      >
-                        <Select.Trigger>
-                          <Select.ValueText placeholder="Select conversation" />
-                        </Select.Trigger>
-                        <Select.IndicatorGroup>
-                          <Select.Indicator />
-                        </Select.IndicatorGroup>
-                      </Select.Control>
-                      <Portal>
-                        <Select.Positioner>
-                          <Select.Content>
-                            {conversationCollection.items.map((item) => (
-                              <Select.Item item={item} key={item.value}>
-                                {item.label}
-                                <Select.ItemIndicator />
-                              </Select.Item>
-                            ))}
-                          </Select.Content>
-                        </Select.Positioner>
-                      </Portal>
-                    </Select.Root>
-                  </Box>
-                  <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
-                </HStack>
-              </VStack>
-            </Box>
           </VStack>
         </HStack>
       )}

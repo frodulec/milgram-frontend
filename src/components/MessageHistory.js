@@ -106,7 +106,7 @@ const MessageHistory = ({
 
             return (
               <Box
-                key={index}
+                key={`${message.speaker}-${index}-${message.text?.substring(0, 20)}`}
                 ref={el => messageRefs.current[index] = el}
                 mb={2}
                 p={2}

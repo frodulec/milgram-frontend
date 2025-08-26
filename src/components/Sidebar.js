@@ -1,10 +1,11 @@
 import React from 'react';
-import { Box, VStack, HStack, IconButton, Portal, Text, Button } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, Text, Button } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu";
 import { DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerHeader, DrawerPositioner, DrawerRoot } from '@chakra-ui/react';
 import CustomSlider from './ui/Slider';
 
-const Sidebar = ({
+// Unified SidebarLayout component that works for both mobile and desktop
+const SidebarLayout = ({
     isMobile,
     isSidebarOpen,
     setIsSidebarOpen,
@@ -26,8 +27,8 @@ const Sidebar = ({
     resetPlaybackStateComplete,
     loadConversationById
 }) => {
-    // Sidebar content component for mobile
-    const SidebarContent = () => (
+
+    const sidebarContent = (
         <VStack align="stretch" spacing={4} p={4} height="100%" bg={colorMode === 'light' ? "white" : "gray.900"}>
             {/* Header with Go Back button and Color Mode Toggle */}
             <VStack align="stretch" spacing={3}>
@@ -44,16 +45,18 @@ const Sidebar = ({
                     </IconButton>
                 </HStack>
 
-                {/* Go Back Button */}
-                <Button
-                    onClick={() => setIsSidebarOpen(false)}
-                    variant="outline"
-                    size="sm"
-                    width="100%"
-                    colorScheme="gray"
-                >
-                    ← Go Back
-                </Button>
+                {/* Go Back Button - only show on mobile */}
+                {isMobile && (
+                    <Button
+                        onClick={() => setIsSidebarOpen(false)}
+                        variant="outline"
+                        size="sm"
+                        width="100%"
+                        colorScheme="gray"
+                    >
+                        ← Go Back
+                    </Button>
+                )}
             </VStack>
 
             {/* Conversation Selection Controls */}
@@ -204,33 +207,52 @@ const Sidebar = ({
         </VStack>
     );
 
+    // Return different layouts based on mobile/desktop but same component
+    if (isMobile) {
+        return (
+            <DrawerRoot
+                open={isSidebarOpen}
+                onOpenChange={(e) => setIsSidebarOpen(e.open)}
+                placement="left"
+                size="sm"
+            >
+                <DrawerBackdrop />
+                <DrawerPositioner>
+                    <DrawerContent>
+                        <DrawerHeader>
+                            <DrawerCloseTrigger />
+                        </DrawerHeader>
+                        <DrawerBody>
+                            {isSidebarOpen && sidebarContent}
+                        </DrawerBody>
+                    </DrawerContent>
+                </DrawerPositioner>
+            </DrawerRoot>
+        );
+    } else {
+        // Desktop layout - return the content directly
+        return (
+            <Box
+                bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+                p={4}
+                borderRadius="md"
+                borderWidth="1px"
+                borderColor="brand.500"
+                boxShadow="sm"
+                minH="240px"
+                height="240px"
+                overflowY="auto"
+            >
+                {sidebarContent}
+            </Box>
+        );
+    }
+};
 
-    return (
-        <>
-            {/* Mobile Sidebar Drawer */}
-            {isMobile && (
-                <DrawerRoot
-                    open={isSidebarOpen}
-                    onOpenChange={(e) => setIsSidebarOpen(e.open)}
-                    placement="left"
-                    size="sm"
-                >
-                    <DrawerBackdrop />
-                    <DrawerPositioner>
-                        <DrawerContent>
-                            <DrawerHeader>
-                                <DrawerCloseTrigger />
-                            </DrawerHeader>
-                            <DrawerBody>
-                                {isSidebarOpen && <SidebarContent />}
-                            </DrawerBody>
-                        </DrawerContent>
-                    </DrawerPositioner>
-                </DrawerRoot>
-            )}
-
-        </>
-    );
+// Keep the original Sidebar component for backward compatibility
+const Sidebar = (props) => {
+    return <SidebarLayout {...props} />;
 };
 
 export default Sidebar;
+export { SidebarLayout };
