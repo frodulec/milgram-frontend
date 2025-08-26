@@ -122,6 +122,8 @@ function App() {
     )
   );
 
+
+
   const filteredConversations = (allConversations || []).filter(c => {
     const modelOk = participantModelFilter === 'All' || (c?.config?.participant_model?.model || '') === participantModelFilter;
     const v = typeof c?.final_voltage === 'number' ? c.final_voltage : 0;
@@ -154,6 +156,17 @@ function App() {
       { label: 'All', value: 'All' },
       ...participantModels.map(m => ({ label: m, value: m }))
     ];
+
+    // Add fallback models for testing if no conversations are loaded
+    if (participantModels.length === 0) {
+      items.push(
+        { label: 'gpt-4', value: 'gpt-4' },
+        { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
+        { label: 'claude-3', value: 'claude-3' }
+      );
+    }
+
+
     return createListCollection({ items });
   }, [participantModels]);
 
@@ -651,7 +664,7 @@ function App() {
                         {participantModelCollection.items.map((item) => (
                           <Select.Item item={item} key={item.value}>
                             {item.label}
-                           <Select.ItemIndicator />
+                            <Select.ItemIndicator />
                           </Select.Item>
                         ))}
                       </Select.Content>
@@ -685,7 +698,7 @@ function App() {
                 </VStack>
 
                 <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
-                 Select conversation
+                  Select conversation
                 </Text>
                 <HStack spacing={2} align="center">
                   <Box flex="1">

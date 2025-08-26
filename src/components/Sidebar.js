@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, VStack, HStack, IconButton, Portal, Select, createListCollection, Text, Button } from '@chakra-ui/react';
+import { Box, VStack, HStack, IconButton, Portal, Text, Button } from '@chakra-ui/react';
 import { LuMoon, LuSun } from "react-icons/lu";
 import { DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerHeader, DrawerPositioner, DrawerRoot } from '@chakra-ui/react';
 import CustomSlider from './ui/Slider';
@@ -27,7 +27,6 @@ const Sidebar = ({
     loadConversationById
 }) => {
     // Sidebar content component for mobile
-    console.log(participantModelCollection)
     const SidebarContent = () => (
         <VStack align="stretch" spacing={4} p={4} height="100%" bg={colorMode === 'light' ? "white" : "gray.900"}>
             {/* Header with Go Back button and Color Mode Toggle */}
@@ -59,41 +58,30 @@ const Sidebar = ({
 
             {/* Conversation Selection Controls */}
             <VStack align="stretch" spacing={3} width="100%">
-                <Select.Root
-                    collection={participantModelCollection}
-                    size="sm"
-                    width="100%"
-                    value={participantModelFilter ? [participantModelFilter] : []}
-                    onValueChange={(details) => setParticipantModelFilter(details.value[0] || 'All')}
-                >
-                    <Select.HiddenSelect name="participant-model-filter" />
-                    <Select.Label>Filter by participant model</Select.Label>
-                    <Select.Control
+                <Box>
+                    <Text fontSize="sm" mb={2} color={colorMode === 'light' ? "semantic.text" : "white"}>
+                        Filter by participant model
+                    </Text>
+                    <Box
+                        as="select"
+                        size="sm"
+                        width="100%"
+                        value={participantModelFilter}
+                        onChange={(e) => setParticipantModelFilter(e.target.value)}
                         bg={colorMode === 'light' ? 'white' : 'gray.700'}
                         borderWidth="1px"
                         borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
                         borderRadius="md"
+                        p={2}
+                        fontSize="sm"
                     >
-                        <Select.Trigger>
-                            <Select.ValueText placeholder="Filter by participant model" />
-                        </Select.Trigger>
-                        <Select.IndicatorGroup>
-                            <Select.Indicator />
-                        </Select.IndicatorGroup>
-                    </Select.Control>
-                    <Portal>
-                        <Select.Positioner>
-                            <Select.Content>
-                                {participantModelCollection.items.map((item) => (
-                                    <Select.Item item={item} key={item.value}>
-                                        {item.label}
-                                        <Select.ItemIndicator />
-                                    </Select.Item>
-                                ))}
-                            </Select.Content>
-                        </Select.Positioner>
-                    </Portal>
-                </Select.Root>
+                        {participantModelCollection?.items?.map((item) => (
+                            <option key={item.value} value={item.value}>
+                                {item.label}
+                            </option>
+                        ))}
+                    </Box>
+                </Box>
 
                 <VStack spacing={1} align="stretch" width="100%">
                     <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
@@ -108,6 +96,49 @@ const Sidebar = ({
                         colorMode={colorMode}
                     />
                 </VStack>
+
+                {/* Conversation Selection */}
+                <Box>
+                    <Text fontSize="sm" mb={2} color={colorMode === 'light' ? "semantic.text" : "white"}>
+                        Select conversation
+                    </Text>
+                    <Box
+                        as="select"
+                        size="sm"
+                        width="100%"
+                        value={selectedConversationId}
+                        onChange={(e) => {
+                            const id = e.target.value;
+                            if (id && id !== selectedConversationId) {
+                                resetPlaybackStateComplete();
+                                setSelectedConversationId(id);
+                                loadConversationById(id);
+                            }
+                        }}
+                        bg={colorMode === 'light' ? 'white' : 'gray.700'}
+                        borderWidth="1px"
+                        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                        borderRadius="md"
+                        p={2}
+                        fontSize="sm"
+                    >
+                        {conversationCollection?.items?.map((item) => (
+                            <option key={item.value} value={item.value}>
+                                {item.label}
+                            </option>
+                        ))}
+                    </Box>
+                </Box>
+
+                {/* Reset Filters Button */}
+                <Button
+                    colorScheme="brand"
+                    onClick={resetAllFilters}
+                    size="sm"
+                    width="100%"
+                >
+                    Reset filters
+                </Button>
             </VStack>
 
             {/* Audio Settings Section */}
