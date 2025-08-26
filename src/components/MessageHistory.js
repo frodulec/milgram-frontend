@@ -54,6 +54,13 @@ const MessageHistory = ({
     return null;
   }
 
+  // Precompute cumulative count of shock messages to determine voltage per occurrence
+  const shockCumulativeCounts = messages.reduce((acc, msg, i) => {
+    const previousCount = i === 0 ? 0 : acc[i - 1];
+    acc[i] = previousCount + (msg.text === 'ELECTRIC_SHOCK_IMAGE' ? 1 : 0);
+    return acc;
+  }, []);
+
   return (
     <HStack>
       <VStack
@@ -103,6 +110,8 @@ const MessageHistory = ({
         >
           {messages.map((message, index) => {
             const isCurrentlyPlaying = index === currentSyncIndex;
+            const isShockMessage = message.text === 'ELECTRIC_SHOCK_IMAGE';
+            const voltage = isShockMessage ? shockCumulativeCounts[index] * 45 : null;
 
             return (
               <Box
@@ -131,10 +140,11 @@ const MessageHistory = ({
                   {message.speaker === 'SHOCKING_DEVICE' ? 'Learner' : message.speaker}
                 </Text>
                 <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
-                  {message.text === 'ELECTRIC_SHOCK_IMAGE' ?
-                    <Text as="span" color="voltage.danger">⚡ Electric Shock ⚡</Text> :
+                  {isShockMessage ? (
+                    <Text as="span" color="voltage.danger">⚡ Electric Shock ({voltage}V)⚡</Text>
+                  ) : (
                     message.text
-                  }
+                  )}
                 </Text>
               </Box>
             );
