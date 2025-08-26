@@ -183,24 +183,29 @@ function App() {
   }, [filteredConversations]);
 
   useEffect(() => {
-    if (!filteredConversations.find(c => c.id === selectedConversationId)) {
-      setSelectedConversationId(filteredConversations[0]?.id || '');
+    const hasSelection = filteredConversations.some(c => c.id === selectedConversationId);
+    if (!hasSelection) {
+      const nextId = filteredConversations[0]?.id || '';
+      if (selectedConversationId !== nextId) {
+        setSelectedConversationId(nextId);
+      }
+      // When no conversations match, reset once if there is content to clear
       if (filteredConversations.length === 0) {
-        // Clear current playback when no conversations match the filters
-        resetPlaybackStateComplete();
+        if (messages.length > 0 || syncQueue.length > 0 || isStarted) {
+          resetPlaybackStateComplete();
+        }
       }
     }
-  }, [participantModelFilter, allConversations, filteredConversations, selectedConversationId]);
+  }, [participantModelFilter, allConversations, filteredConversations, selectedConversationId, messages.length, syncQueue.length, isStarted]);
 
   // Auto-load the currently selected conversation by default
   useEffect(() => {
-    if (selectedConversationId) {
-      // Only auto-load if nothing is currently loaded to avoid disrupting playback
-      if (messages.length === 0) {
-        loadConversationById(selectedConversationId);
-      }
+    if (!selectedConversationId) return;
+    // Only auto-load if nothing is currently loaded to avoid disrupting playback
+    if (messages.length === 0 && syncQueue.length === 0) {
+      loadConversationById(selectedConversationId);
     }
-  }, [selectedConversationId, allConversations]);
+  }, [selectedConversationId, allConversations, messages.length, syncQueue.length]);
 
   const startExperience = ({ new_conversation }) => {
     // If already started, just toggle play/pause
