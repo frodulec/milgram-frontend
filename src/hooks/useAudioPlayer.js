@@ -242,6 +242,17 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
   }, []);
 
   const resetAudioPlayer = useCallback(() => {
+    // Immediately stop any playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      // Clean up any existing audio URL
+      if (audioRef.current.dataset.cleanupUrl) {
+        URL.revokeObjectURL(audioRef.current.dataset.cleanupUrl);
+        delete audioRef.current.dataset.cleanupUrl;
+      }
+    }
+
     setIsPlaying(false);
     setIsMuted(false);
     setIsManuallyPaused(false);
