@@ -563,13 +563,52 @@ function App() {
       ) : (
         /* Desktop Layout */
         <Box position="relative" h="95vh">   
-          <HStack spacing={6} height={"100%"}>
-            {/* Left Column: Image and Audio Controls */}
-            <VStack flex="1" align="stretch" spacing={4} height={"100%"}>
-              {/* Game Image Display with Placeholder */}
-              <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+          <VStack spacing={0} height={"100%"}>
+            {/* Top Row: Image and Message History */}
+            <HStack flex="1" align="stretch" spacing={6} width={"100%"}>
+              {/* Left Tile: Game Image Display */}
+              <Box flex="1" height="100%">
+                <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
+              </Box>
 
-              {/* Audio Controls (full width under the image) */}
+              {/* Right Tile: Message History */}
+              <Box flex="1" height="100%">
+                {filteredConversations.length === 0 ? (
+                  <Box
+                    bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+                    p={4}
+                    borderRadius="md"
+                    height="100%"
+                    overflowY="auto"
+                    borderWidth="1px"
+                    borderColor="brand.500"
+                    boxShadow="md"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <VStack spacing={3}>
+                      <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
+                        No conversations with selected filters
+                      </Text>
+                      <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
+                    </VStack>
+                  </Box>
+                ) : (
+                  <MessageHistory
+                    messages={messages}
+                    currentSyncIndex={currentSyncIndex}
+                    colorMode={colorMode}
+                    followCurrentMessage={followCurrentMessage}
+                    onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+                  />
+                )}
+              </Box>
+            </HStack>
+
+            {/* Bottom Row: Audio Controls and Sidebar */}
+            <HStack flex="1" align="stretch" spacing={6} width={"100%"}>
+              {/* Left Tile: Audio Controls */}
               <Box flex="1" width="100%" height="100%">
                 <AudioControls
                   isPlaying={isPlaying}
@@ -593,71 +632,34 @@ function App() {
                   // tileHeight="240px"
                 />
               </Box>
-            </VStack>
 
-            {/* Right Column: Message History */}
-            <VStack flex="1" align="stretch" spacing={4} height={"100%"}>
-              {filteredConversations.length === 0 ? (
-                <Box
-                  bg={colorMode === 'light' ? "brand.50" : "gray.800"}
-                  p={4}
-                  borderRadius="md"
-                  height="600px"
-                  overflowY="auto"
-                  borderWidth="1px"
-                  borderColor="brand.500"
-                  boxShadow="md"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <VStack spacing={3}>
-                    <Text color={colorMode === 'light' ? "semantic.text" : "white"}>
-                      No conversations with selected filters
-                    </Text>
-                    <Button colorScheme="brand" onClick={resetAllFilters}>Reset filters</Button>
-                  </VStack>
-                </Box>
-              ) : (
-                <MessageHistory
-                  messages={messages}
-                  currentSyncIndex={currentSyncIndex}
+              {/* Right Tile: Sidebar */}
+              <Box flex="1" width="100%" height="100%">
+                <SidebarLayout
+                  isMobile={isMobile}
+                  isSidebarOpen={isSidebarOpen}
+                  setIsSidebarOpen={setIsSidebarOpen}
                   colorMode={colorMode}
-                  followCurrentMessage={followCurrentMessage}
-                  onToggleFollow={() => setFollowCurrentMessage(prev => !prev)}
+                  toggleColorMode={toggleColorMode}
+                  participantModelFilter={participantModelFilter}
+                  setParticipantModelFilter={setParticipantModelFilter}
+                  voltageRange={voltageRange}
+                  setVoltageRange={setVoltageRange}
+                  selectedConversationId={selectedConversationId}
+                  setSelectedConversationId={setSelectedConversationId}
+                  volume={volume}
+                  handleVolumeChange={handleVolumeChange}
+                  playbackRate={playbackRate}
+                  handlePlaybackRateChange={handlePlaybackRateChange}
+                  participantModelCollection={participantModelCollection}
+                  conversationCollection={conversationCollection}
+                  resetAllFilters={resetAllFilters}
+                  resetPlaybackStateComplete={resetPlaybackStateComplete}
+                  loadConversationById={loadConversationById}
                 />
-              )}
-            
-          {/* Sidebar positioned in bottom right */}
-          <Box
-            width="100%"
-            height={"100%"}
-          >
-            <SidebarLayout
-              isMobile={isMobile}
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
-              colorMode={colorMode}
-              toggleColorMode={toggleColorMode}
-              participantModelFilter={participantModelFilter}
-              setParticipantModelFilter={setParticipantModelFilter}
-              voltageRange={voltageRange}
-              setVoltageRange={setVoltageRange}
-              selectedConversationId={selectedConversationId}
-              setSelectedConversationId={setSelectedConversationId}
-              volume={volume}
-              handleVolumeChange={handleVolumeChange}
-              playbackRate={playbackRate}
-              handlePlaybackRateChange={handlePlaybackRateChange}
-              participantModelCollection={participantModelCollection}
-              conversationCollection={conversationCollection}
-              resetAllFilters={resetAllFilters}
-              resetPlaybackStateComplete={resetPlaybackStateComplete}
-              loadConversationById={loadConversationById}
-            />
-          </Box>
-            </VStack>
-          </HStack>
+              </Box>
+            </HStack>
+          </VStack>
 
 
         </Box>

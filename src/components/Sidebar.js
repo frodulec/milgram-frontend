@@ -29,7 +29,7 @@ const SidebarLayout = ({
 }) => {
 
     const sidebarContent = (
-        <VStack align="stretch" spacing={3} p={1} height="100%" bg={isMobile ? colorMode === 'light' ? "white" : "gray.900" : "transparent"}>
+        <VStack align="center" spacing={3} p={1} height="100%" bg={isMobile ? colorMode === 'light' ? "white" : "gray.900" : "transparent"} justifyContent="center">
             {/* Header with Color Mode Toggle */}
             <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="lg" fontWeight="bold" color={colorMode === 'light' ? "semantic.text" : "white"}>
@@ -48,8 +48,8 @@ const SidebarLayout = ({
 
 
             {/* Filter by participant model */}
-            <Box>
-                <Text fontSize="sm" mb={2} color={colorMode === 'light' ? "semantic.text" : "white"}>
+            <Box width="80%">
+                <Text fontSize="sm" mb={2} color={colorMode === 'light' ? "semantic.text" : "white"} textAlign="center">
                     Filter by participant model
                 </Text>
                 <Box
@@ -74,8 +74,8 @@ const SidebarLayout = ({
             </Box>
 
             {/* Voltage range */}
-            <VStack spacing={1} align="stretch" width="100%">
-                <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"}>
+            <VStack spacing={1} align="stretch" width="80%">
+                <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"} textAlign="center">
                     Voltage range: {voltageRange[0]}V – {voltageRange[1]}V
                 </Text>
                 <CustomSlider
@@ -89,8 +89,8 @@ const SidebarLayout = ({
             </VStack>
 
             {/* Conversation Selection */}
-            <Box>
-                <Text fontSize="sm" mb={2} color={colorMode === 'light' ? "semantic.text" : "white"}>
+            <Box width="80%">
+                <Text fontSize="sm" mb={2} color={colorMode === 'light' ? "semantic.text" : "white"} textAlign="center">
                     Select conversation
                 </Text>
                 <Box
@@ -126,7 +126,7 @@ const SidebarLayout = ({
                 colorScheme="brand"
                 onClick={resetAllFilters}
                 size="sm"
-                width="100%"
+                width="80%"
             >
                 Reset filters
             </Button>
