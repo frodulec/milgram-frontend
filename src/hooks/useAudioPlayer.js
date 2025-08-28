@@ -4,7 +4,7 @@ export function useAudioPlayer({ syncQueue, currentSyncIndex, setCurrentSyncInde
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
-  const [playbackRate, setPlaybackRate] = useState(2);
+  const [playbackRate, setPlaybackRate] = useState(1.3);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
 
