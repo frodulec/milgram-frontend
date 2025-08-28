@@ -13,7 +13,7 @@ const MessageHistory = ({
   const messageBoxRef = useRef({});
   const scrollableBoxRef = useRef(null);
 
-  const height = useBreakpointValue({ base: '300px', md: '600px' });
+  const inner_height = useBreakpointValue({ base: '300px', md: '600px' });
 
   // Scroll to the current message when currentSyncIndex changes
   useEffect(() => {
@@ -62,17 +62,21 @@ const MessageHistory = ({
   }, []);
 
   return (
-    <HStack>
+    <Box height="100%"
+      borderWidth="1px"
+      borderColor="brand.500"
+      borderRadius="md"
+      boxShadow="md"
+      bg={colorMode === 'light' ? "brand.50" : "gray.800"}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
       <VStack
         width="100%"
-        bg={colorMode === 'light' ? "brand.50" : "gray.800"}
         p={4}
-        borderRadius="md"
-        height={height}
+        height={inner_height}
         overflowY="auto"
-        borderWidth="1px"
-        borderColor="brand.500"
-        boxShadow="md"
         ref={messageBoxRef}
       >
         <HStack
@@ -150,7 +154,7 @@ const MessageHistory = ({
           })}
         </Box>
       </VStack>
-    </HStack>
+    </Box>
   );
 };
 
