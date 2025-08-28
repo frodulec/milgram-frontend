@@ -123,7 +123,6 @@ function App() {
   );
 
 
-
   const filteredConversations = (allConversations || []).filter(c => {
     const modelOk = participantModelFilter === 'All' || (c?.config?.participant_model?.model || '') === participantModelFilter;
     const v = typeof c?.final_voltage === 'number' ? c.final_voltage : 0;
@@ -427,8 +426,6 @@ function App() {
   // Responsive layout hook
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-
-
   return (
     <Box p={4} maxW="1200px" mx="auto">
       {/* Mobile Header with Menu Button */}
@@ -448,13 +445,13 @@ function App() {
         </HStack>
       ) : (
         <HStack justifyContent="flex-end" alignItems="center" mb={4}>
-          <IconButton
+          {/* <IconButton
             onClick={toggleColorMode}
             variant="outline"
             size="sm"
           >
             {colorMode === "light" ? <LuSun /> : <LuMoon />}
-          </IconButton>
+          </IconButton> */}
         </HStack>
       )}
 
@@ -499,7 +496,8 @@ function App() {
             boxShadow="md"
           >
             {/* Image Display */}
-            <Box minH="300px">
+            <Box minH="300px"
+            >
               <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
             </Box>
           </VStack>
@@ -530,7 +528,7 @@ function App() {
           />
 
           {/* Conversation History as separate tile */}
-          <Box minH="300px" maxH="400px" overflow="auto">
+          <Box  overflow="auto">
             {filteredConversations.length === 0 ? (
               <Box
                 bg={colorMode === 'light' ? "brand.50" : "gray.800"}
@@ -564,21 +562,21 @@ function App() {
         </VStack>
       ) : (
         /* Desktop Layout */
-        <Box position="relative">
-          <HStack align="flex-start" spacing={6}>
+        <Box position="relative" h="95vh">   
+          <HStack spacing={6} height={"100%"}>
             {/* Left Column: Image and Audio Controls */}
-            <VStack flex="1" align="stretch" spacing={4}>
+            <VStack flex="1" align="stretch" spacing={4} height={"100%"}>
               {/* Game Image Display with Placeholder */}
               <ImageDisplay currentImage={currentImage} colorMode={colorMode} />
 
               {/* Audio Controls (full width under the image) */}
-              <Box width="100%">
+              <Box flex="1" width="100%" height="100%">
                 <AudioControls
                   isPlaying={isPlaying}
                   isMuted={isMuted}
                   volume={volume}
                   playbackRate={playbackRate}
-                  currentSyncIndex={currentSyncIndex}
+                  currentSyncIndex={currentSyncIndex} 
                   totalItems={syncQueue.length}
                   onPlayPause={togglePlayPause}
                   onPrevious={playPreviousItem}
@@ -598,7 +596,7 @@ function App() {
             </VStack>
 
             {/* Right Column: Message History */}
-            <VStack flex="1" align="stretch" spacing={4}>
+            <VStack flex="1" align="stretch" spacing={4} height={"100%"}>
               {filteredConversations.length === 0 ? (
                 <Box
                   bg={colorMode === 'light' ? "brand.50" : "gray.800"}
@@ -633,6 +631,7 @@ function App() {
           {/* Sidebar positioned in bottom right */}
           <Box
             width="100%"
+            height={"100%"}
           >
             <SidebarLayout
               isMobile={isMobile}

@@ -177,8 +177,8 @@ const SidebarLayout = ({
                 borderColor="brand.500"
                 boxShadow="sm"
                 minH="240px"
-                // height="240px"
-                // overflowY="auto"
+                align="stretch"
+                height="100%"
             >
                 {sidebarContent}
             </Box>

@@ -15,7 +15,7 @@ const ImageDisplay = ({ currentImage, colorMode }) => {
       alignItems="center"
       justifyContent="center"
       overflow="hidden"
-      borderWidth="2px"
+      borderWidth="1px"
       borderColor="brand.500"
       boxShadow="md"
     >

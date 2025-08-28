@@ -69,7 +69,6 @@ const MessageHistory = ({
         p={4}
         borderRadius="md"
         height={height}
-        maxHeight={height}
         overflowY="auto"
         borderWidth="1px"
         borderColor="brand.500"
