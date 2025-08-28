@@ -563,7 +563,7 @@ function App() {
           </Box>
         </VStack>
       ) : (
-        /* Desktop Layout - Modified to include sidebar in bottom right */
+        /* Desktop Layout */
         <Box position="relative">
           <HStack align="flex-start" spacing={6}>
             {/* Left Column: Image and Audio Controls */}

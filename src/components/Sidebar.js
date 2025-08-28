@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, VStack, HStack, IconButton, Text, Button } from '@chakra-ui/react';
-import { LuMoon, LuSun, LuArrowLeft} from "react-icons/lu";
+import { LuMoon, LuSun, LuArrowBigLeft} from "react-icons/lu";
 import { DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerHeader, DrawerPositioner, DrawerRoot } from '@chakra-ui/react';
 import CustomSlider from './ui/Slider';
 
@@ -29,19 +29,21 @@ const SidebarLayout = ({
 }) => {
 
     const sidebarContent = (
-        <VStack align="stretch" spacing={3} p={4} height="100%" bg={colorMode === 'light' ? "white" : "gray.900"}>
+        <VStack align="stretch" spacing={3} p={1} height="100%" bg={isMobile ? colorMode === 'light' ? "white" : "gray.900" : "transparent"}>
             {/* Header with Color Mode Toggle */}
             <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="lg" fontWeight="bold" color={colorMode === 'light' ? "semantic.text" : "white"}>
                     Settings & Filters
                 </Text>
-                <IconButton
-                    onClick={toggleColorMode}
-                    variant="outline"
-                    size="sm"
-                >
-                    {colorMode === "light" ? <LuSun /> : <LuMoon />}
-                </IconButton>
+                {isMobile && (
+                    <IconButton
+                        onClick={toggleColorMode}
+                        variant="outline"
+                        size="sm"
+                    >
+                        {colorMode === "light" ? <LuSun /> : <LuMoon />}
+                    </IconButton>
+                )}
             </HStack>
 
 
@@ -134,9 +136,9 @@ const SidebarLayout = ({
                 <IconButton
                     onClick={() => setIsSidebarOpen(false)}
                     variant="outline"
-                    size="sm"
+                    size="bg"
                 >
-                    <LuArrowLeft />
+                    <LuArrowBigLeft size={40} strokeWidth={1}/>
                 </IconButton>
             )}
         </VStack>
@@ -175,8 +177,8 @@ const SidebarLayout = ({
                 borderColor="brand.500"
                 boxShadow="sm"
                 minH="240px"
-                height="240px"
-                overflowY="auto"
+                // height="240px"
+                // overflowY="auto"
             >
                 {sidebarContent}
             </Box>
