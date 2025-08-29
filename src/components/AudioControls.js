@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, HStack, IconButton, Slider, Text, Button } from '@chakra-ui/react';
+import { Box, HStack, IconButton, Text, Button } from '@chakra-ui/react';
+import CustomSlider from './ui/Slider';
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaForward, FaBackward } from 'react-icons/fa';
 
 const AudioControls = ({
@@ -120,25 +121,16 @@ const AudioControls = ({
               >
                 Volume:
               </Text>
-              <Slider.Root
-                value={[volume || 0]}
-                onValueChange={(details) => onVolumeChange && onVolumeChange(details.value[0])}
-                min={0}
-                max={1}
-                step={0.1}
-                flex={1}
-                key="volume-slider"
-                thumbAlignment="center"
-              >
-                <Slider.Control>
-                  <Slider.Track>
-                    <Slider.Range />
-                  </Slider.Track>
-                  <Slider.Thumb index={0}>
-                    <Slider.HiddenInput />
-                  </Slider.Thumb>
-                </Slider.Control>
-              </Slider.Root>
+              <Box flex={1}>
+                <CustomSlider
+                  value={[volume || 0]}
+                  onValueChange={(value) => onVolumeChange && onVolumeChange(value[0])}
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  colorMode={colorMode}
+                />
+              </Box>
               <Text
                 fontSize="sm"
                 minW="30px"
@@ -157,25 +149,16 @@ const AudioControls = ({
               >
                 Speed:
               </Text>
-              <Slider.Root
-                value={[playbackRate || 1]}
-                onValueChange={(details) => onPlaybackRateChange && onPlaybackRateChange(details.value[0])}
-                min={0.5}
-                max={4}
-                step={0.1}
-                flex={1}
-                key="speed-slider"
-                thumbAlignment="center"
-              >
-                <Slider.Control>
-                  <Slider.Track>
-                    <Slider.Range />
-                  </Slider.Track>
-                  <Slider.Thumb index={0}>
-                    <Slider.HiddenInput />
-                  </Slider.Thumb>
-                </Slider.Control>
-              </Slider.Root>
+              <Box flex={1}>
+                <CustomSlider
+                  value={[playbackRate || 1]}
+                  onValueChange={(value) => onPlaybackRateChange && onPlaybackRateChange(value[0])}
+                  min={0.5}
+                  max={4}
+                  step={0.1}
+                  colorMode={colorMode}
+                />
+              </Box>
               <Text
                 fontSize="sm"
                 minW="30px"

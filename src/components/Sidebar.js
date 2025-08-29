@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, VStack, HStack, IconButton, Text, Button } from '@chakra-ui/react';
-import { LuMoon, LuSun, LuArrowBigLeft} from "react-icons/lu";
+import { LuMoon, LuSun, LuArrowBigLeft } from "react-icons/lu";
 import { DrawerBackdrop, DrawerBody, DrawerCloseTrigger, DrawerContent, DrawerHeader, DrawerPositioner, DrawerRoot } from '@chakra-ui/react';
 import CustomSlider from './ui/Slider';
 
@@ -121,6 +121,40 @@ const SidebarLayout = ({
                 </Box>
             </Box>
 
+            {/* Volume Control (Mobile Sidebar) */}
+            {isMobile && (
+                <VStack spacing={1} align="stretch" width="80%">
+                    <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"} textAlign="center">
+                        Volume: {Math.round((volume || 0) * 100)}%
+                    </Text>
+                    <CustomSlider
+                        value={[volume || 0]}
+                        onValueChange={(value) => handleVolumeChange && handleVolumeChange(value[0])}
+                        min={0}
+                        max={1}
+                        step={0.1}
+                        colorMode={colorMode}
+                    />
+                </VStack>
+            )}
+
+            {/* Playback Speed Control (Mobile Sidebar) */}
+            {isMobile && (
+                <VStack spacing={1} align="stretch" width="80%">
+                    <Text fontSize="sm" color={colorMode === 'light' ? "semantic.text" : "white"} textAlign="center">
+                        Speed: {playbackRate || 1}x
+                    </Text>
+                    <CustomSlider
+                        value={[playbackRate || 1]}
+                        onValueChange={(value) => handlePlaybackRateChange && handlePlaybackRateChange(value[0])}
+                        min={0.5}
+                        max={4}
+                        step={0.1}
+                        colorMode={colorMode}
+                    />
+                </VStack>
+            )}
+
             {/* Reset Filters Button */}
             <Button
                 colorScheme="brand"
@@ -140,7 +174,7 @@ const SidebarLayout = ({
                     width="80%"
                     bg="brand.500"
                 >
-                    <LuArrowBigLeft size={40} strokeWidth={1}/>
+                    <LuArrowBigLeft size={40} strokeWidth={1} />
                 </IconButton>
             )}
         </VStack>
