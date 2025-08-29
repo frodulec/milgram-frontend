@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Box, VStack, HStack, IconButton, createListCollection, Text, Button, useBreakpointValue } from '@chakra-ui/react';
-import { LuMoon, LuSun, LuSettings } from "react-icons/lu"
+import { LuSettings } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
 import { fetchTTSAudio, getNewContersationEventSource, fetchAllConversations } from './services/apiService';
@@ -187,11 +187,14 @@ function App() {
       const nextId = filteredConversations[0]?.id || '';
       if (selectedConversationId !== nextId) {
         setSelectedConversationId(nextId);
-      }
-      // When no conversations match, reset once if there is content to clear
-      if (filteredConversations.length === 0) {
-        if (messages.length > 0 || syncQueue.length > 0 || isStarted) {
-          resetPlaybackStateComplete();
+        if (nextId) {
+          // Load the newly selected conversation immediately when filters change
+          loadConversationById(nextId);
+        } else {
+          // When no conversations match, reset once if there is content to clear
+          if (messages.length > 0 || syncQueue.length > 0 || isStarted) {
+            resetPlaybackStateComplete();
+          }
         }
       }
     }
@@ -528,7 +531,7 @@ function App() {
           />
 
           {/* Conversation History as separate tile */}
-          <Box  overflow="auto">
+          <Box overflow="auto">
             {filteredConversations.length === 0 ? (
               <Box
                 bg={colorMode === 'light' ? "brand.50" : "gray.800"}
@@ -562,7 +565,7 @@ function App() {
         </VStack>
       ) : (
         /* Desktop Layout */
-        <Box position="relative" h="95vh">   
+        <Box position="relative" h="95vh">
           <VStack spacing={0} height={"100%"}>
             {/* Top Row: Image and Message History */}
             <HStack flex="1" align="stretch" spacing={6} width={"100%"}>
@@ -615,7 +618,7 @@ function App() {
                   isMuted={isMuted}
                   volume={volume}
                   playbackRate={playbackRate}
-                  currentSyncIndex={currentSyncIndex} 
+                  currentSyncIndex={currentSyncIndex}
                   totalItems={syncQueue.length}
                   onPlayPause={togglePlayPause}
                   onPrevious={playPreviousItem}
@@ -629,7 +632,7 @@ function App() {
                   isStarted={isStarted}
                   runPlaybackFunc={() => startExperience({ new_conversation: false })}
                   tileMinHeight="240px"
-                  // tileHeight="240px"
+                // tileHeight="240px"
                 />
               </Box>
 
