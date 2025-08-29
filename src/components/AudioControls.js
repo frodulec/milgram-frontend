@@ -73,6 +73,9 @@ const AudioControls = ({
               size="lg"
               minW="200px"
               onClick={handlePlaybackControl}
+              _hover={{
+                bg: "brand.600"
+              }}
             >
               {isStarted ? (isPlaying ? "Pause Experiment" : "Resume Experiment") : "Start Experiment"}
             </Button>

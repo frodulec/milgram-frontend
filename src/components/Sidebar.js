@@ -173,6 +173,10 @@ const SidebarLayout = ({
                     size="bg"
                     width="80%"
                     bg="brand.500"
+                    color="white"
+                    _hover={{
+                        bg: "brand.600"
+                    }}
                 >
                     <LuArrowBigLeft size={40} strokeWidth={1} />
                 </IconButton>
