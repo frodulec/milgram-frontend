@@ -137,6 +137,8 @@ const SidebarLayout = ({
                     onClick={() => setIsSidebarOpen(false)}
                     variant="outline"
                     size="bg"
+                    width="80%"
+                    bg="brand.500"
                 >
                     <LuArrowBigLeft size={40} strokeWidth={1}/>
                 </IconButton>
