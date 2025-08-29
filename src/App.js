@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Box, VStack, HStack, IconButton, createListCollection, Text, Button, useBreakpointValue } from '@chakra-ui/react';
-import { LuSettings } from "react-icons/lu"
+import { LuSettings, LuInfo } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
 import { fetchTTSAudio, getNewContersationEventSource, fetchAllConversations } from './services/apiService';
@@ -9,6 +9,7 @@ import AudioControls from './components/AudioControls';
 import MessageHistory from './components/MessageHistory';
 import { SidebarLayout } from './components/Sidebar';
 import { useAudioPlayer } from './hooks/useAudioPlayer';
+import ResponsiveDialog from './components/ResponsiveDialog';
 
 function App() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -26,6 +27,7 @@ function App() {
   const [currentSyncIndex, setCurrentSyncIndex] = useState(-1);
   const [isProcessingSync, setIsProcessingSync] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(true);
 
   const eventSourceRef = useRef(null);
   const messageRefs = useRef(new Map());
@@ -444,10 +446,19 @@ function App() {
           <Text fontSize="lg" fontWeight="bold" color={colorMode === 'light' ? "semantic.text" : "white"}>
             Milgram Experiment
           </Text>
-          <Box /> {/* Spacer for center alignment */}
+          <IconButton
+            onClick={() => setIsDialogOpen(true)}
+            variant="outline"
+            size="md"
+          >
+            <LuInfo />
+          </IconButton>
         </HStack>
       ) : (
         <HStack justifyContent="flex-end" alignItems="center" mb={4}>
+          <Button size="sm" variant="outline" leftIcon={<LuInfo />} onClick={() => setIsDialogOpen(true)}>
+            Info
+          </Button>
           {/* <IconButton
             onClick={toggleColorMode}
             variant="outline"
@@ -669,6 +680,34 @@ function App() {
       )}
 
       <audio ref={audioRef} />
+      <ResponsiveDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        isMobile={!!isMobile}
+        colorMode={colorMode}
+        title="Welcome to the Milgram Experiment replaction using LLMs."
+        desktopContent={
+          <VStack align="stretch" spacing={2}>
+            <Text>The top-left panel shows the visualisation of one of the conversations between the Professor, Learner and the Participant -all being AI agents.</Text>
+            <Text>The top-right panel shows the conversation history. Click the pin icon to follow or unfollow the current message.</Text>
+            <Text>Playback controls are in the bottom-left. Use the bottom-right panel to select conversations and filters. </Text>
+          </VStack>
+        }
+        mobileContent={
+          <VStack align="stretch" spacing={2}>
+            <Text>Welcome to the Milgram Experiment replaction using LLMs.</Text>
+            <Text>The image presented is a visualisation of one of the conversations between the Professor, Learner and the Participant -all being AI agents.</Text>
+            <Text>The playback controls and the conversation history are presented under the image. Click the pin icon to follow or unfollow the current message.</Text>
+            <Text>Use the top-left settings button to: <br />
+              <ul>
+                <li> - Pick or filter conversations</li>
+                <li> - Adjust volume and speed</li>
+                <li> - Reset filters</li>
+              </ul>
+            </Text>
+          </VStack>
+        }
+      />
     </Box>
   );
 }
