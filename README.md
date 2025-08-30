@@ -1,36 +1,12 @@
 # Milgram Experiment Frontend
 
-A modern React-based frontend application for conducting psychological learning experiments, specifically designed to simulate and study obedience and learning behaviors in an interactive digital environment.
-
 ## 🎯 Overview
 
-This application provides a sophisticated platform for running psychological experiments that study learning dynamics, obedience patterns, and decision-making processes. The frontend features real-time audio-visual synchronization, dynamic image generation, and an intuitive interface for both researchers and participants.
+A React-based frontend application for visualisation of Milgram experiment conversations which are generated using this repo:
+https://github.com/frodulec/milgram-experiments
 
-## ✨ Features
 
-### 🎮 Interactive Experiment Interface
-- **Real-time Audio-Visual Sync**: Synchronized text-to-speech audio with dynamic visual scenes
-- **Dynamic Image Generation**: Real-time rendering of experiment scenarios using Fabric.js
-- **Character System**: Multiple characters (Professor, Learner, Participant) with distinct roles
-- **Shock Simulation**: Visual representation of experimental stimuli
-
-### 🎨 Modern UI/UX
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Dark/Light Mode**: Toggle between themes for optimal viewing conditions
-- **Accessibility**: Built with accessibility best practices
-- **Smooth Animations**: Framer Motion powered transitions and interactions
-
-### 🔧 Advanced Functionality
-- **Audio Controls**: Playback rate control, volume adjustment, and mute functionality
-- **Message History**: Complete conversation tracking with timestamps
-- **Settings Management**: Configurable experiment parameters
-- **Image Caching**: Optimized performance with intelligent image caching
-- **Real-time Streaming**: Server-Sent Events for live experiment data
-
-### 🐳 Deployment Ready
-- **Docker Support**: Containerized application for easy deployment
-- **Production Optimized**: Image optimization and build optimizations
-- **Environment Configuration**: Flexible backend URL configuration
+This application provides a platform for running psychological experiments that study learning dynamics, obedience patterns, and decision-making processes. The frontend features real-time audio-visual synchronization, dynamic image generation, and an intuitive interface for both researchers and participants.
 
 ## 🚀 Quick Start
 

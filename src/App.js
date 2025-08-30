@@ -681,33 +681,54 @@ function App() {
 
       <audio ref={audioRef} />
       <ResponsiveDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        isMobile={!!isMobile}
-        colorMode={colorMode}
-        title="Welcome to the Milgram Experiment replaction using LLMs."
-        desktopContent={
-          <VStack align="stretch" spacing={2}>
-            <Text>The top-left panel shows the visualisation of one of the conversations between the Professor, Learner and the Participant -all being AI agents.</Text>
-            <Text>The top-right panel shows the conversation history. Click the pin icon to follow or unfollow the current message.</Text>
-            <Text>Playback controls are in the bottom-left. Use the bottom-right panel to select conversations and filters. </Text>
-          </VStack>
-        }
-        mobileContent={
-          <VStack align="stretch" spacing={2}>
-            <Text>Welcome to the Milgram Experiment replaction using LLMs.</Text>
-            <Text>The image presented is a visualisation of one of the conversations between the Professor, Learner and the Participant -all being AI agents.</Text>
-            <Text>The playback controls and the conversation history are presented under the image. Click the pin icon to follow or unfollow the current message.</Text>
-            <Text>Use the top-left settings button to: <br />
-              <ul>
-                <li> - Pick or filter conversations</li>
-                <li> - Adjust volume and speed</li>
-                <li> - Reset filters</li>
-              </ul>
-            </Text>
-          </VStack>
-        }
-      />
+  isOpen={isDialogOpen}
+  onClose={() => setIsDialogOpen(false)}
+  isMobile={!!isMobile}
+  colorMode={colorMode}
+  title="Welcome to the Milgram Experiment Simulation with LLMs"
+  desktopContent={
+    <VStack align="stretch" spacing={2}>
+      <Text>
+        This simulation reimagines the classic Milgram Experiment using large language models. 
+        It explores how AI agents handle authority, obedience, and moral decision-making. 
+      </Text>
+      <Text>
+        • The <Box as="span" color="brand.400" fontWeight="bold">top-left panel</Box>  visualizes a live conversation between the Professor, Learner, and Participant — all AI agents.  
+      </Text>
+      <Text>
+        • The <Box as="span" color="brand.400" fontWeight="bold">top-right panel</Box> shows the conversation history. Use the pin icon to follow or unfollow messages during the playback.  
+      </Text>
+      <Text>
+        • The <Box as="span" color="brand.400" fontWeight="bold">bottom-left</Box> contains playback controls.  
+      </Text>
+      <Text>
+        • The <Box as="span" color="brand.400" fontWeight="bold">bottom-right</Box> lets you browse conversations and apply filters.  
+      </Text>
+    </VStack>
+  }
+  mobileContent={
+    <VStack align="stretch" spacing={2}>
+      <Text>
+        Welcome to the Milgram Experiment Simulation with LLMs. This project explores how AI agents respond to authority and moral dilemmas.  
+      </Text>
+      <Text>
+        The image shows a visualization of a conversation between the Professor, Learner, and Participant — all AI agents.  
+      </Text>
+      <Text>
+        Playback controls and the conversation history are displayed below. Use the pin icon to follow or unfollow messages during the playback.  
+      </Text>
+      <Text>
+        Use the <Box as="span" color="brand.400" fontWeight="bold">top-left settings button</Box> to:  
+        <ul>
+          <li> • Browse or filter conversations</li>
+          <li> • Adjust playback speed and volume</li>
+          <li> • Reset filters</li>
+        </ul>
+      </Text>
+    </VStack>
+  }
+/>
+
     </Box>
   );
 }
