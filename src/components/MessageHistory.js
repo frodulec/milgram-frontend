@@ -13,7 +13,7 @@ const MessageHistory = ({
   const messageBoxRef = useRef({});
   const scrollableBoxRef = useRef(null);
 
-  const inner_height = useBreakpointValue({ base: '300px', md: '600px' });
+  const inner_height = useBreakpointValue({ base: '300px', md: 'min(100%, calc(66.6667vw * 2 / 3))' });
 
   // Scroll to the current message when currentSyncIndex changes
   useEffect(() => {
