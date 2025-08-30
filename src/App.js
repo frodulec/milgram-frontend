@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Box, VStack, HStack, IconButton, createListCollection, Text, Button, useBreakpointValue } from '@chakra-ui/react';
-import { LuSettings, LuInfo } from "react-icons/lu"
+import { LuSettings, LuInfo, LuSun, LuMoon } from "react-icons/lu"
 import { useColorMode } from "./components/ui/color-mode";
 import { imageGenerator } from './services/imageGenerator';
 import { fetchTTSAudio, getNewContersationEventSource, fetchAllConversations } from './services/apiService';
@@ -456,16 +456,16 @@ function App() {
         </HStack>
       ) : (
         <HStack justifyContent="flex-end" alignItems="center" mb={4}>
-          <Button size="sm" variant="outline" leftIcon={<LuInfo />} onClick={() => setIsDialogOpen(true)}>
-            Info
-          </Button>
-          {/* <IconButton
+          <IconButton size="sm" variant="outline" leftIcon={<LuInfo />} onClick={() => setIsDialogOpen(true)}>
+            <LuInfo />
+          </IconButton>
+          <IconButton
             onClick={toggleColorMode}
             variant="outline"
             size="sm"
           >
             {colorMode === "light" ? <LuSun /> : <LuMoon />}
-          </IconButton> */}
+          </IconButton>
         </HStack>
       )}
 
@@ -693,16 +693,16 @@ function App() {
         It explores how AI agents handle authority, obedience, and moral decision-making. 
       </Text>
       <Text>
-        • The <Box as="span" color="brand.400" fontWeight="bold">top-left panel</Box>  visualizes a live conversation between the Professor, Learner, and Participant — all AI agents.  
+        • The <Box as="span" color={colorMode === 'light' ? "brand.500" : "brand.400"}  fontWeight="bold">top-left panel</Box>  visualizes a live conversation between the Professor, Learner, and Participant — all AI agents.  
       </Text>
       <Text>
-        • The <Box as="span" color="brand.400" fontWeight="bold">top-right panel</Box> shows the conversation history. Use the pin icon to follow or unfollow messages during the playback.  
+        • The <Box as="span" color={colorMode === 'light' ? "brand.500" : "brand.400"}  fontWeight="bold">top-right panel</Box> shows the conversation history. Use the pin icon to follow or unfollow messages during the playback.  
       </Text>
       <Text>
-        • The <Box as="span" color="brand.400" fontWeight="bold">bottom-left</Box> contains playback controls.  
+        • The <Box as="span" color={colorMode === 'light' ? "brand.500" : "brand.400"}  fontWeight="bold">bottom-left</Box> contains playback controls.  
       </Text>
       <Text>
-        • The <Box as="span" color="brand.400" fontWeight="bold">bottom-right</Box> lets you browse conversations and apply filters.  
+        • The <Box as="span" color={colorMode === 'light' ? "brand.500" : "brand.400"}  fontWeight="bold">bottom-right</Box> lets you browse conversations and apply filters.  
       </Text>
     </VStack>
   }
@@ -718,7 +718,7 @@ function App() {
         Playback controls and the conversation history are displayed below. Use the pin icon to follow or unfollow messages during the playback.  
       </Text>
       <Text>
-        Use the <Box as="span" color="brand.400" fontWeight="bold">top-left settings button</Box> to:  
+        Use the <Box as="span" color={colorMode === 'light' ? "brand.500" : "brand.400"}  fontWeight="bold">top-left settings button</Box> to:  
         <ul>
           <li> • Browse or filter conversations</li>
           <li> • Adjust playback speed and volume</li>
